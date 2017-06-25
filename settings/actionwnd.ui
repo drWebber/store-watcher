@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ActionWnd</class>
+ <widget class="QWidget" name="ActionWnd">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>461</width>
+    <height>244</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="0" column="0">
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="5" column="1">
+      <widget class="QSpinBox" name="sbStartRow"/>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Колонка артикул</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>Стартовая строка</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="QToolButton" name="tbTryRegExp">
+       <property name="text">
+        <string>try</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1" colspan="2">
+      <widget class="QLabel" name="lbRegExpResult">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="leRegExp"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Регулярное выражение</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="leCurrentDir"/>
+     </item>
+     <item row="2" column="2">
+      <widget class="QToolButton" name="tbChooseDir">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Директория файла</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1" colspan="2">
+      <widget class="QComboBox" name="cmbStorePlacement"/>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Расположение склада</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1" colspan="2">
+      <widget class="QComboBox" name="cmbManufacturer"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Производитель</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1" colspan="2">
+      <widget class="QPushButton" name="pbSubmit">
+       <property name="text">
+        <string>Сохранить</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Колонка количество</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QSpinBox" name="sbArticle"/>
+     </item>
+     <item row="7" column="1">
+      <widget class="QSpinBox" name="sbItemCount"/>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>tbChooseDir</sender>
+   <signal>clicked()</signal>
+   <receiver>ActionWnd</receiver>
+   <slot>chooseDir()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>436</x>
+     <y>71</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>230</x>
+     <y>84</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tbTryRegExp</sender>
+   <signal>clicked()</signal>
+   <receiver>ActionWnd</receiver>
+   <slot>tryRegExp()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>437</x>
+     <y>97</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>230</x>
+     <y>84</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pbSubmit</sender>
+   <signal>clicked()</signal>
+   <receiver>ActionWnd</receiver>
+   <slot>submitClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>293</x>
+     <y>147</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>230</x>
+     <y>84</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>chooseDir()</slot>
+  <slot>tryRegExp()</slot>
+  <slot>submitClicked()</slot>
+ </slots>
+</ui>
