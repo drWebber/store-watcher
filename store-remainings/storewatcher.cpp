@@ -1,9 +1,9 @@
 #include "store-remainings/storewatcher.h"
 #include "store-updater/storeupdater.h"
 #include <qsqlquery.h>
-#include <qdebug.h>
 #include <qmessagebox.h>
 #include <qthread.h>
+#include <qdebug.h>
 
 StoreWatcher::StoreWatcher()
 {
@@ -51,18 +51,19 @@ void StoreWatcher::setUp()
 
 void StoreWatcher::storeRemainsChanged(QString path)
 {
-    //не пашед QThread::sleep(1800); //ждем 180 секунд на скачивание файлов
     for (int i = 0; i < sr.count(); ++i) {
         StoreRemainings *tmp = sr.at(i);
         QString tmpPath = tmp->getCurrentFilePath();
         if (tmpPath.contains(path)) {
+            qDebug() << "файл " + tmpPath + " удален";
             fsw->removePath(tmpPath); //удаляем из wather'a исчезнувший файл
+            QThread::sleep(10);
             tmp->updateCurrentFile();
             //удаляем все записи остатков по smid
             //читаем новый excel-файл
             //заливаем новые остатки в базу
             fsw->addPath(tmp->getCurrentFilePath()); //добавляем в wather новый файл
-            qDebug() << tmpPath;
+            qDebug() << "новый файл " + tmp->getCurrentFilePath() + " добавлен в вотчер";
         }
     }
 }

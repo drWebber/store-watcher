@@ -2,13 +2,15 @@
 #define STOREUPDATER_H
 
 #include <qstring.h>
+#include <qthread.h>
 #include "store-remainings/storeremainings.h"
 
-class StoreUpdater
+class StoreUpdater : public QThread
 {
 public:
     StoreUpdater(QString xlsFilePath);
     void update();
+    void run();
 private:
     QString xlsFilePath;
     QString csvFilePath;

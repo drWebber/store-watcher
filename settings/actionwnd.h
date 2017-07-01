@@ -23,6 +23,7 @@ public:
     void submit();
 private:
     void setModelData();
+    QString getFilePath();
 private slots:
     void chooseDir();
     void tryRegExp();

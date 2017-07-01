@@ -15,3 +15,8 @@ void StoreUpdater::update()
     xlsReader->xlsToCsv(xlsFilePath, csvFilePath);
 }
 
+void StoreUpdater::run()
+{
+    qDebug() << "yeeeehhh, we are in thread";
+}
+
