@@ -55,15 +55,11 @@ void StoreWatcher::storeRemainsChanged(QString path)
         StoreRemainings *tmp = sr.at(i);
         QString tmpPath = tmp->getCurrentFilePath();
         if (tmpPath.contains(path)) {
-            qDebug() << "файл " + tmpPath + " удален";
             fsw->removePath(tmpPath); //удаляем из wather'a исчезнувший файл
-            QThread::sleep(10);
-            tmp->updateCurrentFile();
-            //удаляем все записи остатков по smid
-            //читаем новый excel-файл
-            //заливаем новые остатки в базу
-            fsw->addPath(tmp->getCurrentFilePath()); //добавляем в wather новый файл
-            qDebug() << "новый файл " + tmp->getCurrentFilePath() + " добавлен в вотчер";
+            qDebug() << "файл " + tmpPath + " удален";
+            //создаем StoreUpdater как отдельный поток
+            StoreUpdater *su = new StoreUpdater(tmp->getCurrentFilePath(), *fsw, *tmp);
+            su->start();
         }
     }
 }
