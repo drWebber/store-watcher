@@ -2,6 +2,7 @@
 #include "xls/xlsreader.h"
 #include <qregularexpression.h>
 #include <qdebug.h>
+#include <qsqlquery.h>
 StoreUpdater::StoreUpdater(QString xlsFilePath)
 {
     this->xlsFilePath = xlsFilePath;
@@ -21,6 +22,30 @@ void StoreUpdater::update()
     qDebug() << "update event";
     XlsReader *xlsReader = new XlsReader();
     xlsReader->xlsToCsv(xlsFilePath, csvFilePath);
+
+    //читаем csv
+    QSqlQuery statement;
+    statement.exec("START TRANSACTION");
+    statement.prepare("INSERT INTO test(article, qty) VALUES (:article, :qty)");
+    QFile csvFile(csvFilePath);
+    if(csvFile.open(QFile::ReadOnly | QFile::Text)) {
+        QTextStream stream(&csvFile);
+        for (int i(0); i < sr->getStartRow()-1; i++) stream.readLine(); //пропускаем нужное число строк
+                                                                        //начало задано в бд остатков
+        while(!stream.atEnd()){
+           QString line = stream.readLine();
+           QStringList item = line.split(";");
+           if (item[sr->getArticleCol()-1] == "") continue;
+               statement.bindValue(":article", item[sr->getArticleCol()-1]);
+               statement.bindValue(":qty", item[sr->getItemCountCol()-1]);
+               statement.exec();
+            }
+            stream.flush();
+        }
+    statement.exec("COMMIT");
+
+    csvFile.close();
+    csvFile.remove();
 }
 
 void StoreUpdater::run()
@@ -34,8 +59,8 @@ void StoreUpdater::run()
     //удаляем все записи остатков по smid
     //читаем новый excel-файл
     //заливаем новые остатки в базу
-    fsw->addPath(xlsFilePath); //добавляем в wather новый файл
-    qDebug() << "новый файл " + xlsFilePath + " добавлен в вотчер";
+    fsw->addPath(xlsFilePath); //добавляем в watcher новый файл
+    qDebug() << "новый файл " + xlsFilePath + " добавлен в уотчер";
 }
 
 void StoreUpdater::updateCsvFilePath(QString xlsFilePath)
