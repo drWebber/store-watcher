@@ -5,13 +5,13 @@
 StoreUpdater::StoreUpdater(QString xlsFilePath)
 {
     this->xlsFilePath = xlsFilePath;
-    csvFilePath = xlsFilePath.replace(QRegularExpression(".xlsx?"), ".csv").replace("/", "\\");
+    updateCsvFilePath(xlsFilePath);
 }
 
 StoreUpdater::StoreUpdater(QString xlsFilePath, QFileSystemWatcher &fsw, StoreRemainings &sr)
 {
     this->xlsFilePath = xlsFilePath;
-    csvFilePath = xlsFilePath.replace(QRegularExpression(".xlsx?"), ".csv").replace("/", "\\");
+    updateCsvFilePath(xlsFilePath);
     this->fsw = &fsw;
     this->sr = &sr;
 }
@@ -28,10 +28,18 @@ void StoreUpdater::run()
     qDebug() << "yeeeehhh, we are in thread";
     QThread::sleep(10);
     sr->updateCurrentFile();
+    xlsFilePath = sr->getCurrentFilePath();
+    updateCsvFilePath(xlsFilePath);
+    update();
     //удаляем все записи остатков по smid
     //читаем новый excel-файл
     //заливаем новые остатки в базу
-    fsw->addPath(sr->getCurrentFilePath()); //добавляем в wather новый файл
-    qDebug() << "новый файл " + sr->getCurrentFilePath() + " добавлен в вотчер";
+    fsw->addPath(xlsFilePath); //добавляем в wather новый файл
+    qDebug() << "новый файл " + xlsFilePath + " добавлен в вотчер";
+}
+
+void StoreUpdater::updateCsvFilePath(QString xlsFilePath)
+{
+    csvFilePath = xlsFilePath.replace(QRegularExpression(".xlsx?"), ".csv").replace("/", "\\");
 }
 

@@ -2,6 +2,7 @@
 #include <qaxobject.h>
 #include <qaxwidget.h>
 #include <qmessagebox.h>
+#include <dshow.h>
 #define xlCSV 6
 
 XlsReader::XlsReader()
@@ -12,12 +13,13 @@ XlsReader::XlsReader()
 void XlsReader::xlsToCsv(QString xlsFilePath, QString csvFilePath)
 {
     if(!xlsFilePath.isEmpty()){
-        QAxWidget excel("Excel.Application");
+        CoInitialize(0);
+        QAxObject *excel = new QAxObject( "Excel.Application", NULL);
 
-        QAxObject *workbooks = excel.querySubObject("WorkBooks");
+        QAxObject *workbooks = excel->querySubObject("WorkBooks");
         workbooks->dynamicCall("Open (const QString&)", xlsFilePath);
 
-        QAxObject *workbook = excel.querySubObject("ActiveWorkBook");
+        QAxObject *workbook = excel->querySubObject("ActiveWorkBook");
 
         QAxObject *sheets = workbook->querySubObject("Worksheets");
         QAxObject *sheet = sheets->querySubObject("Item(int)", 1); //1 - "Лист 1"
@@ -29,13 +31,13 @@ void XlsReader::xlsToCsv(QString xlsFilePath, QString csvFilePath)
 
         workbook->dynamicCall("SaveAs (const QString&, const int&)", csvFilePath, xlCSV);
 
-        excel.setProperty("DisplayAlerts", false);
+        excel->setProperty("DisplayAlerts", false);
         workbook->dynamicCall("Close (Boolean)", true);
 
         delete workbook;
         delete workbooks;
 
-        excel.dynamicCall("Quit (void)");
+        excel->dynamicCall("Quit (void)");
     } else {
         QMessageBox::critical(NULL, "Ошибка открытия файла", "Путь к xls файлу пуст");
     }

@@ -14,6 +14,8 @@ public:
     void update();
     void run();
 private:
+    void updateCsvFilePath(QString xlsFilePath);
+private:
     QString xlsFilePath;
     QString csvFilePath;
     int rowCount = -1;
