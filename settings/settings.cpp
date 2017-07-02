@@ -50,7 +50,6 @@ void Settings::editRow()
     editWnd->setWindowTitle("Редактор параметров");
     editWnd->setUp();
     editWnd->show();
-
 }
 
 void Settings::delRow()

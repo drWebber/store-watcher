@@ -9,6 +9,8 @@ public:
                         QTableView &tableView,
                         QWidget *parent = 0);
     void setUp();
+public slots:
+    void submitClicked();
 };
 
 #endif // EDITSTORE_H

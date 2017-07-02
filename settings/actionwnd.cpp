@@ -2,7 +2,8 @@
 #include "ui_actionwnd.h"
 
 #include <qfiledialog.h>
-#include <qmessagebox.h>
+#include <qdebug.h>
+#include <qsqlerror.h>
 
 #define STOREPLACE_COL 1
 #define MANUFACTURER_COL 2
@@ -40,8 +41,8 @@ void ActionWnd::setModelData()
     model->setData(indx, ui->cmbStorePlacement->currentText());
 
     QSqlQuery sq;
-    sq.prepare("SELECT mid FROM manufacturers WHERE `name` = :name;");
-    sq.bindValue(":name", ui->cmbManufacturer->currentText());
+    sq.prepare("SELECT mid FROM manufacturers WHERE name = :name;");
+    sq.bindValue(":name", ui->cmbManufacturer->currentText());    
     QString mid = query.getSingleVal(sq).toString();
     indx = tableView->model()->index(currentRow, MANUFACTURER_COL);
     model->setData(indx, mid);
@@ -63,13 +64,6 @@ void ActionWnd::setModelData()
 
     indx = tableView->model()->index(currentRow, ITEM_COUNT_COL);
     model->setData(indx, ui->sbItemCount->text());
-}
-
-void ActionWnd::submitClicked()
-{
-    this->setModelData();
-    model->submit();
-    this->close();
 }
 
 void ActionWnd::chooseDir()

@@ -3,6 +3,9 @@
 #include <qregularexpression.h>
 #include <qdebug.h>
 #include <qsqlquery.h>
+#include <qfileinfo.h>
+#include <qdatetime.h>
+
 StoreUpdater::StoreUpdater(StoreRemainings &sr)
 {
     this->xlsFilePath = sr.getCurrentFilePath();
@@ -56,9 +59,15 @@ void StoreUpdater::update()
             stream.flush();
         }
     statement.exec("COMMIT");
-
     csvFile.close();
     csvFile.remove();
+
+    //обновляем инфо о дате обновленного файла остатков (таблица StoreDate)
+    QFileInfo fileInfo(xlsFilePath);
+    statement.prepare("UPDATE StoreDate SET date = :creationDate WHERE smid = :smid");
+    statement.bindValue(":creationDate", fileInfo.created().toString("dd.MM.yyyy"));
+    statement.bindValue(":smid", sr->getSmid());
+    statement.exec();
 }
 
 void StoreUpdater::run()
@@ -69,11 +78,8 @@ void StoreUpdater::run()
     xlsFilePath = sr->getCurrentFilePath();
     updateCsvFilePath(xlsFilePath);
     update();
-    //удаляем все записи остатков по smid
-    //читаем новый excel-файл
-    //заливаем новые остатки в базу
     fsw->addPath(xlsFilePath); //добавляем в watcher новый файл
-    qDebug() << "новый файл " + xlsFilePath + " добавлен в уотчер";
+    qDebug() << "новый файл " + xlsFilePath + " добавлен в watcher";
 }
 
 void StoreUpdater::updateCsvFilePath(QString xlsFilePath)

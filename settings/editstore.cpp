@@ -1,6 +1,8 @@
 #include "editstore.h"
 #include "ui_actionwnd.h"
 
+#include <qfile.h>
+
 #define STOREPLACE_COL 1
 #define MANUFACTURER_COL 2
 #define DIRPATH_COL 3
@@ -40,4 +42,16 @@ void EditStore::setUp()
 
     indx = tableView->model()->index(currentRow, ITEM_COUNT_COL);
     ui->sbItemCount->setValue(tableView->model()->data(indx).toInt());
+}
+
+void EditStore::submitClicked()
+{
+    QFile rFile(getFilePath());
+    if (rFile.exists()) {
+        this->setModelData();
+        model->submit();
+        this->close();
+    } else {
+        QMessageBox::warning(NULL, "Ошибка", "Файл по указанному регулятрому выражению не найден!");
+    }
 }
