@@ -31,12 +31,9 @@ void StoreWatcher::setUp()
 
         if(lastFilePath.isEmpty()){
             tmp->updateCurrentFile();
-            StoreUpdater su(tmp->getCurrentFilePath());
+            StoreUpdater su(*tmp);
             su.update();
-            //добавить импорт данных в бд
-            tmp->updateCurrentFile();
             qDebug() << tmp->getCurrentFilePath();
-            //записать в бд ласт файл
         }
 
         if(QFile::exists(tmp->getCurrentFilePath())){

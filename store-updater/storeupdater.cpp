@@ -3,9 +3,9 @@
 #include <qregularexpression.h>
 #include <qdebug.h>
 #include <qsqlquery.h>
-StoreUpdater::StoreUpdater(QString xlsFilePath)
+StoreUpdater::StoreUpdater(StoreRemainings &sr)
 {
-    this->xlsFilePath = xlsFilePath;
+    this->xlsFilePath = sr.getCurrentFilePath();
     updateCsvFilePath(xlsFilePath);
 }
 
@@ -23,10 +23,19 @@ void StoreUpdater::update()
     XlsReader *xlsReader = new XlsReader();
     xlsReader->xlsToCsv(xlsFilePath, csvFilePath);
 
-    //читаем csv
     QSqlQuery statement;
     statement.exec("START TRANSACTION");
-    statement.prepare("INSERT INTO test(article, qty) VALUES (:article, :qty)");
+
+    //удаляем устаревшие остатки
+    statement.prepare("DELETE FROM store WHERE smid = :smid");
+    statement.bindValue(":smid", sr->getSmid());
+    statement.exec();
+
+    //заливаем новые остатки
+    statement.prepare("INSERT INTO store(pid, smid, count) VALUES ((SELECT pid FROM products WHERE art = :article), :smid, :qty)");
+    //statement.prepare("INSERT INTO store(pid, smid, count) VALUES (:article, :smid, :qty)");
+
+    //читаем csv
     QFile csvFile(csvFilePath);
     if(csvFile.open(QFile::ReadOnly | QFile::Text)) {
         QTextStream stream(&csvFile);
@@ -37,8 +46,12 @@ void StoreUpdater::update()
            QStringList item = line.split(";");
            if (item[sr->getArticleCol()-1] == "") continue;
                statement.bindValue(":article", item[sr->getArticleCol()-1]);
+               statement.bindValue(":smid", sr->getSmid());
                statement.bindValue(":qty", item[sr->getItemCountCol()-1]);
                statement.exec();
+               qDebug() << "article: " + item[sr->getArticleCol()-1];
+               qDebug() << "smid: " + QString::number(sr->getSmid());
+               qDebug() << "qty: " + item[sr->getItemCountCol()-1];
             }
             stream.flush();
         }
@@ -51,7 +64,7 @@ void StoreUpdater::update()
 void StoreUpdater::run()
 {
     qDebug() << "yeeeehhh, we are in thread";
-    QThread::sleep(10);
+    QThread::sleep(5);
     sr->updateCurrentFile();
     xlsFilePath = sr->getCurrentFilePath();
     updateCsvFilePath(xlsFilePath);

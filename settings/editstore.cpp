@@ -5,9 +5,10 @@
 #define MANUFACTURER_COL 2
 #define DIRPATH_COL 3
 #define REGEXP_COL 4
-#define START_ROW 5
-#define ARTICLE_COL 6
-#define ITEM_COUNT_COL 7
+#define CURR_PATH 5
+#define START_ROW 6
+#define ARTICLE_COL 7
+#define ITEM_COUNT_COL 8
 
 EditStore::EditStore(QSqlRelationalTableModel &model, QTableView &tableView, QWidget *parent) :
     ActionWnd(model, tableView, parent)
