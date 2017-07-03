@@ -5,6 +5,7 @@
 #include <qsqlquery.h>
 #include <qfileinfo.h>
 #include <qdatetime.h>
+#include <qsystemtrayicon.h>
 
 StoreUpdater::StoreUpdater(StoreRemainings &sr)
 {
@@ -70,13 +71,33 @@ void StoreUpdater::update()
 void StoreUpdater::run()
 {
     qDebug() << "yeeeehhh, we are in thread";
-    QThread::sleep(5);
-    sr->updateCurrentFile();
-    xlsFilePath = sr->getCurrentFilePath();
-    updateCsvFilePath(xlsFilePath);
-    update();
-    fsw->addPath(xlsFilePath); //добавляем в watcher новый файл
-    qDebug() << "новый файл " + xlsFilePath + " добавлен в watcher";
+    int timeFreezeKoef = 1;
+    do {
+        QThread::sleep(10*timeFreezeKoef);
+        sr->updateCurrentFile();
+        timeFreezeKoef++;
+        qDebug() << "timeFreezeKoef = " + QString::number(timeFreezeKoef);
+    } while (!QFile::exists(sr->getCurrentFilePath()) && timeFreezeKoef < 10);
+    if(QFile::exists(sr->getCurrentFilePath())){
+        xlsFilePath = sr->getCurrentFilePath();
+        updateCsvFilePath(xlsFilePath);
+        update();
+        fsw->addPath(xlsFilePath); //добавляем в watcher новый файл
+        qDebug() << "новый файл " + xlsFilePath + " добавлен в watcher";
+    } else {
+        QSqlQuery query = QSqlQuery();
+        query.prepare("SELECT mn.name, sm.storePlace "
+                      "FROM store_manufacturer AS sm INNER JOIN manufacturers AS mn ON sm.mid = mn.mid "
+                      "WHERE sm.smid = :smid");
+        query.bindValue(":smid", sr->getSmid());
+        query.exec();
+        query.next();
+
+        QSystemTrayIcon trayIcon;
+        trayIcon.setVisible(true);
+        trayIcon.showMessage("Файл не найден", "Файл остатков " + query.value(0).toString() +
+                                 " " + query.value(1).toString() + " не найден");
+    }
 }
 
 void StoreUpdater::updateCsvFilePath(QString xlsFilePath)
