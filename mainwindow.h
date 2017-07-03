@@ -20,6 +20,7 @@ public:
 public slots:
     void showSettingsWnd();
     void executeFile();
+    void updateTable();
 private:
     Ui::MainWindow *ui;
     Settings *settingsWnd;
