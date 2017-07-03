@@ -11,6 +11,8 @@ class StoreWatcher : public QObject
 public:
     StoreWatcher();
     void setUp();
+    void addFile(QString filePath);
+    void removeFile(QString filePath);
 private slots:
     void storeRemainsChanged(QString path);
 private:

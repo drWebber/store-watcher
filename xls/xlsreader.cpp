@@ -27,7 +27,7 @@ void XlsReader::xlsToCsv(QString xlsFilePath, QString csvFilePath)
         QAxObject *range = sheet->querySubObject("UsedRange");
 
         QAxObject *rows = range->querySubObject("Rows");
-        int rowCount = rows->dynamicCall("Count()").toInt();
+        //int rowCount = rows->dynamicCall("Count()").toInt();
 
         workbook->dynamicCall("SaveAs (const QString&, const int&)", csvFilePath, xlCSV);
 

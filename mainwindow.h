@@ -24,6 +24,7 @@ private:
     Ui::MainWindow *ui;
     Settings *settingsWnd;
     QSqlRelationalTableModel *model;
+    StoreWatcher *sw;
 };
 
 #endif // MAINWINDOW_H

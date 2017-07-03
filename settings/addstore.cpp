@@ -3,8 +3,8 @@
 
 #include <qfile.h>
 
-AddStore::AddStore(QSqlRelationalTableModel &model, QTableView &tableView, QWidget *parent) :
-    ActionWnd(model, tableView, parent)
+AddStore::AddStore(QSqlRelationalTableModel &model, QTableView &tableView, StoreWatcher &sw, QWidget *parent) :
+    ActionWnd(model, tableView, sw, parent)
 {
 
 }
@@ -16,21 +16,11 @@ void AddStore::setUp()
     tableView->selectRow(currentRow);
 }
 
-void AddStore::submitClicked()
+void AddStore::beforeSubmit()
 {
-    QFile rFile(getFilePath());
-    if (rFile.exists()) {
-        this->setModelData();
-        model->submit();
-
-        QSqlQuery query;
-        query.prepare("INSERT INTO store_date(smid) VALUES((SELECT smid FROM store_manufacturer WHERE mid = (SELECT mid FROM manufacturers WHERE name = :manName) AND storePlace = :storePlace))");
-        query.bindValue(":manName", ui->cmbManufacturer->currentText());
-        query.bindValue(":storePlace", ui->cmbStorePlacement->currentText());
-        query.exec();
-
-        this->close();
-    } else {
-        QMessageBox::warning(NULL, "Ошибка", "Файл по указанному регулятрому выражению не найден!");
-    }
+    QSqlQuery query;
+    query.prepare("INSERT INTO store_date(smid) VALUES((SELECT smid FROM store_manufacturer WHERE mid = (SELECT mid FROM manufacturers WHERE name = :manName) AND storePlace = :storePlace))");
+    query.bindValue(":manName", ui->cmbManufacturer->currentText());
+    query.bindValue(":storePlace", ui->cmbStorePlacement->currentText());
+    query.exec();
 }

@@ -46,14 +46,26 @@ void StoreWatcher::setUp()
     }
 }
 
+void StoreWatcher::addFile(QString filePath)
+{
+    qDebug() << "файл " + filePath + " добавлен в watcher";
+    fsw->addPath(filePath);
+}
+
+void StoreWatcher::removeFile(QString filePath)
+{
+    qDebug() << "файл " + filePath + " удален из watcher'a";
+    fsw->removePath(filePath);
+}
+
 void StoreWatcher::storeRemainsChanged(QString path)
 {
+    qDebug() << "файл " + path + " удален";
     for (int i = 0; i < sr.count(); ++i) {
         StoreRemainings *tmp = sr.at(i);
         QString tmpPath = tmp->getCurrentFilePath();
         if (tmpPath.contains(path)) {
             fsw->removePath(tmpPath); //удаляем из wather'a исчезнувший файл
-            qDebug() << "файл " + tmpPath + " удален";
             //создаем StoreUpdater как отдельный поток
             StoreUpdater *su = new StoreUpdater(tmp->getCurrentFilePath(), *fsw, *tmp);
             su->start();

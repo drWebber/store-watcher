@@ -1,12 +1,15 @@
 #include "settings.h"
 #include "ui_settings.h"
 #include <qdebug.h>
+#define CURR_PATH 5
 
-Settings::Settings(QWidget *parent) :
+Settings::Settings(StoreWatcher &sw, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Settings)
 {
     ui->setupUi(this);
+
+    this->sw = &sw;
 
     //запрещаем редактирование
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -38,7 +41,7 @@ Settings::~Settings()
 
 void Settings::addRow()
 {
-    addWnd = new AddStore(*model, *ui->tableView);
+    addWnd = new AddStore(*model, *ui->tableView, *sw);
     addWnd->setWindowTitle("Добавить файл остатков");
     addWnd->setUp();
     addWnd->show();
@@ -46,7 +49,7 @@ void Settings::addRow()
 
 void Settings::editRow()
 {
-    editWnd = new EditStore(*model, *ui->tableView);
+    editWnd = new EditStore(*model, *ui->tableView, *sw);
     editWnd->setWindowTitle("Редактор параметров");
     editWnd->setUp();
     editWnd->show();
@@ -55,7 +58,11 @@ void Settings::editRow()
 void Settings::delRow()
 {
     int currentRow = ui->tableView->currentIndex().row();
+    QModelIndex indx = ui->tableView->model()->index(currentRow, CURR_PATH);
+    sw->removeFile(ui->tableView->model()->data(indx).toString());
+
     model->removeRow(currentRow);
+
     ui->tableView->hideRow(currentRow);
     ui->tableView->selectRow(currentRow-1);
 }

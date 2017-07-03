@@ -14,7 +14,7 @@
 #define ARTICLE_COL 7
 #define ITEM_COUNT_COL 8
 
-ActionWnd::ActionWnd(QSqlRelationalTableModel &model, QTableView &tableView, QWidget *parent) :
+ActionWnd::ActionWnd(QSqlRelationalTableModel &model, QTableView &tableView, StoreWatcher &sw, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ActionWnd)
 {
@@ -22,6 +22,7 @@ ActionWnd::ActionWnd(QSqlRelationalTableModel &model, QTableView &tableView, QWi
 
     this->model = &model;
     this->tableView = &tableView;
+    this->sw = &sw;
 
     ui->cmbManufacturer->addItems(query.getSingleValsList("SELECT name FROM manufacturers"));
 
@@ -91,4 +92,21 @@ void ActionWnd::tryRegExp()
 {
     ui->lbRegExpResult->setText("");
     ui->lbRegExpResult->setText(getFilePath());
+}
+
+void ActionWnd::submitClicked()
+{
+    QFile rFile(getFilePath());
+    if (rFile.exists()) {
+        this->setModelData();
+        model->submit();
+
+        sw->addFile(getFilePath());
+
+        beforeSubmit();
+
+        this->close();
+    } else {
+        QMessageBox::warning(NULL, "Ошибка", "Файл по указанному регулятрому выражению не найден!");
+    }
 }

@@ -52,9 +52,6 @@ void StoreUpdater::update()
                statement.bindValue(":smid", sr->getSmid());
                statement.bindValue(":qty", item[sr->getItemCountCol()-1]);
                statement.exec();
-               qDebug() << "article: " + item[sr->getArticleCol()-1];
-               qDebug() << "smid: " + QString::number(sr->getSmid());
-               qDebug() << "qty: " + item[sr->getItemCountCol()-1];
             }
             stream.flush();
         }

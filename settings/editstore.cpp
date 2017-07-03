@@ -12,8 +12,8 @@
 #define ARTICLE_COL 7
 #define ITEM_COUNT_COL 8
 
-EditStore::EditStore(QSqlRelationalTableModel &model, QTableView &tableView, QWidget *parent) :
-    ActionWnd(model, tableView, parent)
+EditStore::EditStore(QSqlRelationalTableModel &model, QTableView &tableView, StoreWatcher &sw, QWidget *parent) :
+    ActionWnd(model, tableView, sw, parent)
 {
 
 }
@@ -42,16 +42,11 @@ void EditStore::setUp()
 
     indx = tableView->model()->index(currentRow, ITEM_COUNT_COL);
     ui->sbItemCount->setValue(tableView->model()->data(indx).toInt());
+
+    oldPath = getFilePath();
 }
 
-void EditStore::submitClicked()
+void EditStore::beforeSubmit()
 {
-    QFile rFile(getFilePath());
-    if (rFile.exists()) {
-        this->setModelData();
-        model->submit();
-        this->close();
-    } else {
-        QMessageBox::warning(NULL, "Ошибка", "Файл по указанному регулятрому выражению не найден!");
-    }
+    sw->removeFile(oldPath);
 }
