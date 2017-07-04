@@ -2,7 +2,7 @@
 #define SETTINGS_H
 
 #include <QWidget>
-#include <qsqlrelationaltablemodel.h>
+#include <QtSql/qsqlrelationaltablemodel.h>
 #include "settings/addstore.h"
 #include "settings/editstore.h"
 #include "store-remainings/storewatcher.h"

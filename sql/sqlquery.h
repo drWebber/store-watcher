@@ -1,6 +1,6 @@
 #ifndef SQLQUERY_H
 #define SQLQUERY_H
-#include <qsqlquery.h>
+#include <QtSql/qsqlquery.h>
 #include <qvariant.h>
 
 class SqlQuery

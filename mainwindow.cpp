@@ -6,7 +6,7 @@
 #include <QTime>
 #include <qfile.h>
 #include <qdir.h>
-#include <qsqlquery.h>
+#include <QtSql/qsqlquery.h>
 #include <qurl.h>
 #include <qdesktopservices.h>
 

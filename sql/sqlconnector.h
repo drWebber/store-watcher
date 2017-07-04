@@ -1,6 +1,6 @@
 #ifndef SQLCONNECTOR_H
 #define SQLCONNECTOR_H
-#include <qsqldatabase.h>
+#include <QtSql/qsqldatabase.h>
 
 class SqlConnector
 {

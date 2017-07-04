@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include "settings/settings.h"
 #include "store-remainings/storeremainings.h"
-#include <qsqlrelationaltablemodel.h>
+#include <QtSql/qsqlrelationaltablemodel.h>
 
 namespace Ui {
 class MainWindow;

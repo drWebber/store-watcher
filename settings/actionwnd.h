@@ -2,7 +2,7 @@
 #define ACTIONWND_H
 
 #include <QWidget>
-#include <qsqlrelationaltablemodel.h>
+#include <QtSql/qsqlrelationaltablemodel.h>
 #include <qtableview.h>
 #include "sql/sqlquery.h"
 #include <qmessagebox.h>
