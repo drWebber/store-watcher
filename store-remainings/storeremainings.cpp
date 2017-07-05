@@ -30,7 +30,7 @@ void StoreRemainings::updateCurrentFile()
         }
     }
     QSqlQuery query;
-    query.prepare("UPDATE `store_manufacturer` SET `lastPath` = :lastpath WHERE `smid` = :smid");
+    query.prepare("UPDATE store_manufacturer SET lastPath = :lastpath WHERE smid = :smid");
     query.bindValue(":lastpath", currentFilePath);
     query.bindValue(":smid", smid);
     query.exec();

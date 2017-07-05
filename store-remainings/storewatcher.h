@@ -18,6 +18,7 @@ private slots:
 private:
     QVector<StoreRemainings*> sr;
     QFileSystemWatcher *fsw;
+    StoreRemainings *getStoreRemainings(QString path);
 };
 
 #endif // STOREWATCHER_H

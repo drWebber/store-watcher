@@ -61,7 +61,11 @@ void MainWindow::executeFile()
 {
     int currentRow = ui->tableView->currentIndex().row();
     QString path = ui->tableView->model()->index(currentRow, 5).data().toString();
-    QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+    if(QFile::exists(path)){
+        QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+    } else{
+
+    }
 }
 
 void MainWindow::updateTable()

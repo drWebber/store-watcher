@@ -9,8 +9,7 @@
 class StoreUpdater : public QThread
 {
 public:
-    StoreUpdater(StoreRemainings &sr);
-    StoreUpdater(QString xlsFilePath, QFileSystemWatcher &fsw, StoreRemainings &sr);
+    StoreUpdater(QFileSystemWatcher &fsw, StoreRemainings &sr);
     void update();
     void run();
 private:

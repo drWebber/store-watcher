@@ -7,15 +7,9 @@
 #include <qdatetime.h>
 #include <qsystemtrayicon.h>
 
-StoreUpdater::StoreUpdater(StoreRemainings &sr)
+StoreUpdater::StoreUpdater(QFileSystemWatcher &fsw, StoreRemainings &sr)
 {
-    this->xlsFilePath = sr.getCurrentFilePath();
-    updateCsvFilePath(xlsFilePath);
-}
-
-StoreUpdater::StoreUpdater(QString xlsFilePath, QFileSystemWatcher &fsw, StoreRemainings &sr)
-{
-    this->xlsFilePath = xlsFilePath;
+    xlsFilePath = sr.getCurrentFilePath();
     updateCsvFilePath(xlsFilePath);
     this->fsw = &fsw;
     this->sr = &sr;
@@ -37,7 +31,6 @@ void StoreUpdater::update()
 
     //заливаем новые остатки
     statement.prepare("INSERT INTO store(pid, smid, count) VALUES ((SELECT pid FROM products WHERE art = :article), :smid, :qty)");
-    //statement.prepare("INSERT INTO store(pid, smid, count) VALUES (:article, :smid, :qty)");
 
     //читаем csv
     QFile csvFile(csvFilePath);
@@ -75,6 +68,7 @@ void StoreUpdater::run()
     do {
         QThread::sleep(10*timeFreezeKoef);
         sr->updateCurrentFile();
+        qDebug() << "sr->getCurrentFilePath()" + sr->getCurrentFilePath();
         timeFreezeKoef++;
         qDebug() << "timeFreezeKoef = " + QString::number(timeFreezeKoef);
     } while (!QFile::exists(sr->getCurrentFilePath()) && timeFreezeKoef < 10);

@@ -13,8 +13,8 @@ void SqlConnector::connect()
     db = QSqlDatabase::addDatabase("QMYSQL3");
     db.setHostName("localhost");
     db.setDatabaseName("nordelectro");
-    db.setUserName("nordelectro");
-    db.setPassword("by3CVUTCN04oYS1H");
+    db.setUserName("root");
+    //db.setPassword("by3CVUTCN04oYS1H");
     if (!db.open()){
         QMessageBox::critical(NULL, "Ошибка", db.lastError().text());
         qDebug() << db.lastError().text();

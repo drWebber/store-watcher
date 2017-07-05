@@ -29,20 +29,17 @@ void StoreWatcher::setUp()
         StoreRemainings *tmp = new StoreRemainings(smid, mid, path, regExp, lastFilePath, startRow,
                                                    articleCol, itemCountCol);
 
-        if(lastFilePath.isEmpty()){
+        if(lastFilePath.isEmpty() || !QFile::exists(lastFilePath)){
+            qDebug() << "файл " + lastFilePath + " не существует или пустой!";
             tmp->updateCurrentFile();
-            StoreUpdater su(*tmp);
-            su.update();
+            StoreUpdater *su = new StoreUpdater(*fsw, *tmp);
+            su->start();
             qDebug() << tmp->getCurrentFilePath();
+        } else {
+            fsw->addPath(tmp->getCurrentFilePath());
         }
 
-        if(QFile::exists(tmp->getCurrentFilePath())){
-            sr.append(tmp);
-            fsw->addPath(tmp->getCurrentFilePath());
-        } else {
-            QMessageBox::information(NULL, "Ошибка", "Файл " + tmp->getCurrentFilePath()
-                                     + " не найден! smid = " + mid);
-        }
+        sr.append(tmp);
     }
 }
 
@@ -60,16 +57,25 @@ void StoreWatcher::removeFile(QString filePath)
 
 void StoreWatcher::storeRemainsChanged(QString path)
 {
-    qDebug() << "файл " + path + " удален";
+    if(!QFile::exists(path)) {
+        qDebug() << "файл " + path + " недоступен";
+        StoreRemainings *tmp = getStoreRemainings(path);
+        StoreUpdater *su = new StoreUpdater(*fsw, *tmp);
+        su->start();
+    }
+}
+
+StoreRemainings *StoreWatcher::getStoreRemainings(QString path)
+{
+    StoreRemainings *tmp;
     for (int i = 0; i < sr.count(); ++i) {
-        StoreRemainings *tmp = sr.at(i);
+        tmp = sr.at(i);
         QString tmpPath = tmp->getCurrentFilePath();
         if (tmpPath.contains(path)) {
             fsw->removePath(tmpPath); //удаляем из wather'a исчезнувший файл
-            //создаем StoreUpdater как отдельный поток
-            StoreUpdater *su = new StoreUpdater(tmp->getCurrentFilePath(), *fsw, *tmp);
-            su->start();
+            break;
         }
     }
+    return tmp;
 }
 
