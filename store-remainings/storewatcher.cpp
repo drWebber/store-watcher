@@ -57,6 +57,7 @@ void StoreWatcher::removeFile(QString filePath)
 
 void StoreWatcher::storeRemainsChanged(QString path)
 {
+    emit fileIsBusy(path);
     if(!QFile::exists(path)) {
         qDebug() << "файл " + path + " недоступен";
         StoreRemainings *tmp = getStoreRemainings(path);

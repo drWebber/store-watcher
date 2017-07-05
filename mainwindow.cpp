@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     model->select();
 
     sw = new StoreWatcher();
+    connect(sw, SIGNAL(fileIsBusy(QString)), this, SLOT(markBusyFile(QString))); // slot
 
     //запрещаем редактирование
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -64,11 +65,22 @@ void MainWindow::executeFile()
     if(QFile::exists(path)){
         QDesktopServices::openUrl(QUrl::fromLocalFile(path));
     } else{
-
+        //
     }
 }
 
 void MainWindow::updateTable()
 {
     model->select();
+}
+
+void MainWindow::markBusyFile(QString path)
+{
+    QModelIndexList foundIndexes = ui->tableView->model()->match(model->index(0,5), Qt::DisplayRole, path);
+    foreach (QModelIndex indx, foundIndexes) {
+        QBrush yellow;
+        yellow.setColor(Qt::yellow);
+        model->setData(ui->tableView->model()->index(0,1), QVariant(QBrush(Qt::red)), Qt::BackgroundRole);
+        qDebug() << QString::number(indx.row());
+    }
 }

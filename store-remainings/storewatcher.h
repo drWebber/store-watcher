@@ -15,6 +15,8 @@ public:
     void removeFile(QString filePath);
 private slots:
     void storeRemainsChanged(QString path);
+signals:
+    QString fileIsBusy(QString path);
 private:
     QVector<StoreRemainings*> sr;
     QFileSystemWatcher *fsw;

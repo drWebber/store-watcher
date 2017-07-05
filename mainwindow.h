@@ -21,6 +21,7 @@ public slots:
     void showSettingsWnd();
     void executeFile();
     void updateTable();
+    void markBusyFile(QString path);
 private:
     Ui::MainWindow *ui;
     Settings *settingsWnd;
