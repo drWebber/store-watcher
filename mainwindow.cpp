@@ -9,6 +9,7 @@
 #include <QtSql/qsqlquery.h>
 #include <qurl.h>
 #include <qdesktopservices.h>
+#include <qsortfilterproxymodel.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -26,19 +27,30 @@ MainWindow::MainWindow(QWidget *parent) :
     model->setRelation(2, QSqlRelation("manufacturers", "mid", "name"));
     model->select();
 
+    //Лев Алексеевский уроки Qt
+    //http://imaginativethinking.ca/use-qt-qsortfilterproxymodel/
+
     sw = new StoreWatcher();
     connect(sw, SIGNAL(fileIsBusy(QString)), this, SLOT(markBusyFile(QString))); // slot
 
+    QSortFilterProxyModel *proxy = new QSortFilterProxyModel(this);
+    proxy->setSourceModel(model);
+
     //запрещаем редактирование
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->tableView->setModel(model);
-    ui->tableView->hideColumn(0);
-    ui->tableView->hideColumn(3);
-    ui->tableView->hideColumn(4);
-    ui->tableView->hideColumn(5);
-    ui->tableView->hideColumn(6);
-    ui->tableView->hideColumn(7);
-    ui->tableView->hideColumn(8);
+    ui->tableView->setModel(proxy);
+//    ui->tableView->hideColumn(0);
+//    ui->tableView->hideColumn(3);
+//    ui->tableView->hideColumn(4);
+//    ui->tableView->hideColumn(5);
+//    ui->tableView->hideColumn(6);
+//    ui->tableView->hideColumn(7);
+//    ui->tableView->hideColumn(8);
+    QBrush brush;
+    brush.setColor(QColor(Qt::red));
+    ui->tableView->model()->setData(ui->tableView->model()->index(1,1), QVariant(brush), Qt::BackgroundRole);
+    proxy->sort(2, Qt::AscendingOrder);
+    ui->tableView->update();
 }
 
 MainWindow::~MainWindow()
