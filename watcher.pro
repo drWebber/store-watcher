@@ -36,7 +36,8 @@ SOURCES += main.cpp\
     store-remainings/storeremainings.cpp \
     store-remainings/storewatcher.cpp \
     store-updater/storeupdater.cpp \
-    xls/xlsreader.cpp
+    xls/xlsreader.cpp \
+    delegates/rowcolorerdelegate.cpp
 
 HEADERS  += mainwindow.h \
     settings/settings.h \
@@ -48,7 +49,8 @@ HEADERS  += mainwindow.h \
     store-remainings/storeremainings.h \
     store-remainings/storewatcher.h \
     store-updater/storeupdater.h \
-    xls/xlsreader.h
+    xls/xlsreader.h \
+    delegates/rowcolorerdelegate.h
 
 FORMS    += mainwindow.ui \
     settings/settings.ui \

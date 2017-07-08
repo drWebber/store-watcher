@@ -5,6 +5,7 @@
 #include "settings/settings.h"
 #include "store-remainings/storeremainings.h"
 #include <QtSql/qsqlrelationaltablemodel.h>
+#include "delegates/rowcolorerdelegate.h"
 
 namespace Ui {
 class MainWindow;
@@ -27,6 +28,7 @@ private:
     Settings *settingsWnd;
     QSqlRelationalTableModel *model;
     StoreWatcher *sw;
+    RowColorerDelegate *rowColorerDelegate;
 };
 
 #endif // MAINWINDOW_H
