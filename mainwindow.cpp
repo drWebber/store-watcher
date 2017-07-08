@@ -36,20 +36,22 @@ MainWindow::MainWindow(QWidget *parent) :
     //запрещаем редактирование
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableView->setModel(proxy);
-//    ui->tableView->hideColumn(0);
-//    ui->tableView->hideColumn(3);
-//    ui->tableView->hideColumn(4);
-//    ui->tableView->hideColumn(5);
-//    ui->tableView->hideColumn(6);
-//    ui->tableView->hideColumn(7);
-//    ui->tableView->hideColumn(8);
+    ui->tableView->hideColumn(0);
+    ui->tableView->hideColumn(3);
+    ui->tableView->hideColumn(4);
+    ui->tableView->hideColumn(5);
+    ui->tableView->hideColumn(6);
+    ui->tableView->hideColumn(7);
+    ui->tableView->hideColumn(8);
 
-    rowColorerDelegate = new RowColorerDelegate();
-    rowColorerDelegate->addGrayWord("Витебск");
 
+    rowColorerDelegate = new RowColorerDelegate(*proxy);
+    rowColorerDelegate->setSmIdColor(14, "red");
+    rowColorerDelegate->setSmIdColor(12, "gray");
     ui->tableView->setItemDelegate(rowColorerDelegate);
     proxy->sort(2, Qt::AscendingOrder);
     ui->tableView->update();
+
 }
 
 MainWindow::~MainWindow()
