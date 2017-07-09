@@ -22,11 +22,13 @@ public slots:
     void showSettingsWnd();
     void executeFile();
     void updateTable();
-    void markBusyFile(QString path);
+    void markBusyFile(int smid);
+    void markUpdatedFile(StoreRemainings *sr);
 private:
     Ui::MainWindow *ui;
     Settings *settingsWnd;
     QSqlRelationalTableModel *model;
+    QSortFilterProxyModel *proxy;
     StoreWatcher *sw;
     RowColorerDelegate *rowColorerDelegate;
 };

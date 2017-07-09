@@ -19,6 +19,11 @@ MainWindow::MainWindow(QWidget *parent) :
     SqlConnector sc;
     sc.connect();
 
+    if(!sc.isOpen()){
+        QMessageBox::critical(this, "Ошибка", "Соединение с базой данных не установлено. \nРабота приложения завершена.");
+        exit(0);
+    }
+
     QSqlQuery query;
     query.exec("SET NAMES 'cp1251'");
 
@@ -27,11 +32,11 @@ MainWindow::MainWindow(QWidget *parent) :
     model->setRelation(2, QSqlRelation("manufacturers", "mid", "name"));
     model->select();
 
-    sw = new StoreWatcher();
-    connect(sw, SIGNAL(fileIsBusy(QString)), this, SLOT(markBusyFile(QString))); // slot
-
-    QSortFilterProxyModel *proxy = new QSortFilterProxyModel(this);
+    proxy = new QSortFilterProxyModel(this);
     proxy->setSourceModel(model);
+
+    proxy->setHeaderData(1, Qt::Horizontal, "Расположение");
+    proxy->setHeaderData(2, Qt::Horizontal, "Производитель");
 
     //запрещаем редактирование
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -44,14 +49,15 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableView->hideColumn(7);
     ui->tableView->hideColumn(8);
 
-
     rowColorerDelegate = new RowColorerDelegate(*proxy);
-    rowColorerDelegate->setSmIdColor(14, "red");
-    rowColorerDelegate->setSmIdColor(12, "gray");
     ui->tableView->setItemDelegate(rowColorerDelegate);
     proxy->sort(2, Qt::AscendingOrder);
     ui->tableView->update();
 
+    sw = new StoreWatcher();
+    connect(sw, SIGNAL(fileIsBusy(int)), this, SLOT(markBusyFile(int))); // slot
+    connect(sw, SIGNAL(updateFinished(StoreRemainings*)), this, SLOT(markUpdatedFile(StoreRemainings*)));
+    sw->setUp();
 }
 
 MainWindow::~MainWindow()
@@ -62,6 +68,7 @@ MainWindow::~MainWindow()
 void MainWindow::showSettingsWnd()
 {
     settingsWnd = new Settings(*sw);
+    settingsWnd->setWindowIcon(QIcon(":/recources/images/Programs.png"));
 
     settingsWnd->setAttribute(Qt::WA_DeleteOnClose);
     connect(settingsWnd, SIGNAL(destroyed(QObject*)), this, SLOT(updateTable()));
@@ -77,8 +84,6 @@ void MainWindow::executeFile()
     QString path = ui->tableView->model()->index(currentRow, 5).data().toString();
     if(QFile::exists(path)){
         QDesktopServices::openUrl(QUrl::fromLocalFile(path));
-    } else{
-        //
     }
 }
 
@@ -87,13 +92,19 @@ void MainWindow::updateTable()
     model->select();
 }
 
-void MainWindow::markBusyFile(QString path)
+void MainWindow::markBusyFile(int smid)
 {
-    QModelIndexList foundIndexes = ui->tableView->model()->match(model->index(0,5), Qt::DisplayRole, path);
-    foreach (QModelIndex indx, foundIndexes) {
-        QBrush yellow;
-        yellow.setColor(Qt::yellow);
-        model->setData(ui->tableView->model()->index(0,1), QVariant(QBrush(Qt::red)), Qt::BackgroundRole);
-        qDebug() << QString::number(indx.row());
+    rowColorerDelegate->setSmIdColor(smid, "gray");
+    model->select();
+}
+
+void MainWindow::markUpdatedFile(StoreRemainings *sr)
+{
+    if(sr->getCurrentFilePath().isEmpty()){
+        rowColorerDelegate->unsetSmidColor(sr->getSmid());
+        rowColorerDelegate->setSmIdColor(sr->getSmid(), "red");
+    } else{
+        rowColorerDelegate->unsetSmidColor(sr->getSmid());
     }
+    model->select();
 }

@@ -15,8 +15,10 @@ public:
     void removeFile(QString filePath);
 private slots:
     void storeRemainsChanged(QString path);
+    void threadFinished(StoreRemainings *sr);
 signals:
-    QString fileIsBusy(QString path);
+    int fileIsBusy(int smid);
+    StoreRemainings *updateFinished(StoreRemainings *sr);
 private:
     QVector<StoreRemainings*> sr;
     QFileSystemWatcher *fsw;

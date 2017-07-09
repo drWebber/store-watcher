@@ -66,12 +66,10 @@ void StoreUpdater::run()
     qDebug() << "yeeeehhh, we are in thread";
     int timeFreezeKoef = 1;
     do {
-        QThread::sleep(10*timeFreezeKoef);
+        QThread::sleep(15*timeFreezeKoef);
         sr->updateCurrentFile();
-        qDebug() << "sr->getCurrentFilePath()" + sr->getCurrentFilePath();
         timeFreezeKoef++;
-        qDebug() << "timeFreezeKoef = " + QString::number(timeFreezeKoef);
-    } while (!QFile::exists(sr->getCurrentFilePath()) && timeFreezeKoef < 10);
+    } while (!QFile::exists(sr->getCurrentFilePath()) && timeFreezeKoef < 20);
     if(QFile::exists(sr->getCurrentFilePath())){
         xlsFilePath = sr->getCurrentFilePath();
         updateCsvFilePath(xlsFilePath);
@@ -92,6 +90,7 @@ void StoreUpdater::run()
         trayIcon.showMessage("Файл не найден", "Файл остатков " + query.value(0).toString() +
                                  " " + query.value(1).toString() + " не найден");
     }
+    emit updateFinished(sr);
 }
 
 void StoreUpdater::updateCsvFilePath(QString xlsFilePath)

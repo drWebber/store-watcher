@@ -9,7 +9,6 @@ StoreWatcher::StoreWatcher()
 {
     fsw = new QFileSystemWatcher();
     connect(fsw, SIGNAL(fileChanged(QString)), this, SLOT(storeRemainsChanged(QString)));
-    this->setUp();
 }
 
 void StoreWatcher::setUp()
@@ -32,9 +31,10 @@ void StoreWatcher::setUp()
         if(lastFilePath.isEmpty() || !QFile::exists(lastFilePath)){
             qDebug() << "файл " + lastFilePath + " не существует или пустой!";
             tmp->updateCurrentFile();
+            emit fileIsBusy(tmp->getSmid());
             StoreUpdater *su = new StoreUpdater(*fsw, *tmp);
             su->start();
-            qDebug() << tmp->getCurrentFilePath();
+            connect(su, SIGNAL(updateFinished(StoreRemainings*)), this, SLOT(threadFinished(StoreRemainings*)), Qt::QueuedConnection);
         } else {
             fsw->addPath(tmp->getCurrentFilePath());
         }
@@ -57,13 +57,19 @@ void StoreWatcher::removeFile(QString filePath)
 
 void StoreWatcher::storeRemainsChanged(QString path)
 {
-    emit fileIsBusy(path);
     if(!QFile::exists(path)) {
         qDebug() << "файл " + path + " недоступен";
         StoreRemainings *tmp = getStoreRemainings(path);
+        emit fileIsBusy(tmp->getSmid());
         StoreUpdater *su = new StoreUpdater(*fsw, *tmp);
         su->start();
+        connect(su, SIGNAL(updateFinished(StoreRemainings*)), this, SLOT(threadFinished(StoreRemainings*)), Qt::QueuedConnection);
     }
+}
+
+void StoreWatcher::threadFinished(StoreRemainings* sr)
+{
+    emit updateFinished(sr);
 }
 
 StoreRemainings *StoreWatcher::getStoreRemainings(QString path)

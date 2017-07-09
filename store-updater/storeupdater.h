@@ -8,12 +8,15 @@
 
 class StoreUpdater : public QThread
 {
+    Q_OBJECT
 public:
     StoreUpdater(QFileSystemWatcher &fsw, StoreRemainings &sr);
     void update();
     void run();
 private:
     void updateCsvFilePath(QString xlsFilePath);
+signals:
+    StoreRemainings *updateFinished(StoreRemainings *sr);
 private:
     QString xlsFilePath;
     QString csvFilePath;

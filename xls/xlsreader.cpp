@@ -21,12 +21,12 @@ void XlsReader::xlsToCsv(QString xlsFilePath, QString csvFilePath)
 
         QAxObject *workbook = excel->querySubObject("ActiveWorkBook");
 
-        QAxObject *sheets = workbook->querySubObject("Worksheets");
-        QAxObject *sheet = sheets->querySubObject("Item(int)", 1); //1 - "Лист 1"
+        //QAxObject *sheets = workbook->querySubObject("Worksheets");
+        //QAxObject *sheet = sheets->querySubObject("Item(int)", 1); //1 - "Лист 1"
 
-        QAxObject *range = sheet->querySubObject("UsedRange");
+        //QAxObject *range = sheet->querySubObject("UsedRange");
 
-        QAxObject *rows = range->querySubObject("Rows");
+        //QAxObject *rows = range->querySubObject("Rows");
         //int rowCount = rows->dynamicCall("Count()").toInt();
 
         workbook->dynamicCall("SaveAs (const QString&, const int&)", csvFilePath, xlCSV);

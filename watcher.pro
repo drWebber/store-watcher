@@ -55,3 +55,6 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui \
     settings/settings.ui \
     settings/actionwnd.ui
+
+RESOURCES += \
+    resources.qrc

@@ -42,6 +42,7 @@ Settings::~Settings()
 void Settings::addRow()
 {
     addWnd = new AddStore(*model, *ui->tableView, *sw);
+    addWnd->setWindowIcon(QIcon(":/recources/images/Programs.png"));
     addWnd->setWindowTitle("Добавить файл остатков");
     addWnd->setUp();
     addWnd->show();
@@ -50,6 +51,7 @@ void Settings::addRow()
 void Settings::editRow()
 {
     editWnd = new EditStore(*model, *ui->tableView, *sw);
+    editWnd->setWindowIcon(QIcon(":/recources/images/Programs.png"));
     editWnd->setWindowTitle("Редактор параметров");
     editWnd->setUp();
     editWnd->show();
