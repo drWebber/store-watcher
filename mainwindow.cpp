@@ -10,6 +10,7 @@
 #include <qurl.h>
 #include <qdesktopservices.h>
 #include <qsortfilterproxymodel.h>
+#include <QCloseEvent>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -58,6 +59,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(sw, SIGNAL(fileIsBusy(int)), this, SLOT(markBusyFile(int))); // slot
     connect(sw, SIGNAL(updateFinished(StoreRemainings*)), this, SLOT(markUpdatedFile(StoreRemainings*)));
     sw->setUp();
+
+    this->setTrayIconActions();
+    this->showTrayIcon();
 }
 
 MainWindow::~MainWindow()
@@ -107,4 +111,64 @@ void MainWindow::markUpdatedFile(StoreRemainings *sr)
         rowColorerDelegate->unsetSmidColor(sr->getSmid());
     }
     model->select();
+}
+
+void MainWindow::setTrayIconActions()
+{
+    showAction = new QAction("Показать");
+    hideAction = new QAction("Свернуть");
+    quitAction = new QAction("Выход");
+
+    trayMenu = new QMenu(this);
+
+    connect(showAction, SIGNAL(triggered()), this, SLOT(showNormal()));
+    connect(hideAction, SIGNAL(triggered()), this, SLOT(hide()));
+    connect(quitAction, SIGNAL(triggered()), this, SLOT(close()));
+
+    trayMenu->addAction(showAction);
+    trayMenu->addAction(hideAction);
+    trayMenu->addAction(quitAction);
+}
+
+void MainWindow::showTrayIcon()
+{
+    trayIcon = new QSystemTrayIcon(QIcon(":/recources/images/Programs.png"));
+    trayIcon->setContextMenu(trayMenu);
+    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+            this, SLOT(trayIconActivated(QSystemTrayIcon::ActivationReason)));
+    trayIcon->show();
+}
+
+void MainWindow::trayIconActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    switch (reason) {
+    case QSystemTrayIcon::Trigger:
+        emit hide();
+        break;
+    case QSystemTrayIcon::DoubleClick:
+        emit show();
+        break;
+    default:
+        break;
+    }
+}
+
+void MainWindow::changeEvent(QEvent * event)
+{
+    //при нажатии свернуть - прячем mainWindow в трей
+    if(event->type() == QEvent::WindowStateChange && isMinimized()){
+        this -> hide();
+    }
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    if(this->isVisible()){
+        //При нажатии на крестик прячем MainWindow вместо закрытия
+        this->hide();
+        event->ignore();
+    } else {
+        trayIcon->hide();
+        event->accept();
+    }
 }

@@ -7,7 +7,9 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.setWindowIcon(QIcon(":/recources/images/Programs.png"));
     w.setWindowTitle("Store Updater");
-    w.show();    
+
+    //не выводим окно, вместо этого создаем иконку в трее!
+    w.show();
 
     return a.exec();
 }
