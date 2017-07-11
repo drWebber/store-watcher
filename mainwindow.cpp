@@ -147,6 +147,7 @@ void MainWindow::trayIconActivated(QSystemTrayIcon::ActivationReason reason)
         break;
     case QSystemTrayIcon::DoubleClick:
         emit show();
+        this->setFocus();
         break;
     default:
         break;
@@ -157,7 +158,7 @@ void MainWindow::changeEvent(QEvent * event)
 {
     //при нажатии свернуть - прячем mainWindow в трей
     if(event->type() == QEvent::WindowStateChange && isMinimized()){
-        this -> hide();
+        this->hide();
     }
 }
 
@@ -170,5 +171,15 @@ void MainWindow::closeEvent(QCloseEvent *event)
     } else {
         trayIcon->hide();
         event->accept();
+    }
+}
+
+void MainWindow::on_btnSetFilter_triggered(bool checked)
+{
+    if (checked) {
+        proxy->setFilterKeyColumn(ui->tableView->currentIndex().column());
+        proxy->setFilterFixedString(ui->tableView->currentIndex().data().toString());
+    } else {
+        proxy->setFilterFixedString("");
     }
 }

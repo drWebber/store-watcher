@@ -58,3 +58,6 @@ FORMS    += mainwindow.ui \
 
 RESOURCES += \
     resources.qrc
+
+DISTFILES += \
+    ../../Иконки/toolbar/filter_add-64.png

@@ -8,6 +8,9 @@ Settings::Settings(StoreWatcher &sw, QWidget *parent) :
     ui(new Ui::Settings)
 {
     ui->setupUi(this);
+    ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->tableView, SIGNAL(customContextMenuRequested(QPoint)),
+            this, SLOT(tableContextMenuRequested(QPoint)));
 
     this->sw = &sw;
 
@@ -27,11 +30,23 @@ Settings::Settings(StoreWatcher &sw, QWidget *parent) :
     model->setHeaderData(8, Qt::Horizontal, "Колонка кол-во");
     model->select();
 
-    ui->pbEdit->setDisabled(true);
-    ui->pdDel->setDisabled(true);
+    proxy = new QSortFilterProxyModel();
+    proxy->setSourceModel(model);
 
-    ui->tableView->setModel(model);
+    ui->btnEdit->setDisabled(true);
+    ui->btnRemove->setDisabled(true);
+
+    ui->tableView->setModel(proxy);
     ui->tableView->hideColumn(0);
+
+    QSize btnSize(24, 24);
+    ui->btnAdd->setIcon(QIcon(":/recources/images/add.png"));
+    ui->btnAdd->setFixedWidth(32);
+    ui->btnAdd->setIconSize(btnSize);
+    ui->btnRemove->setIcon(QIcon(":/recources/images/remove.png"));
+    ui->btnRemove->setIconSize(btnSize);
+    ui->btnEdit->setIcon(QIcon(":/recources/images/configure.png"));
+    ui->btnEdit->setIconSize(btnSize);
 }
 
 Settings::~Settings()
@@ -39,7 +54,14 @@ Settings::~Settings()
     delete ui;
 }
 
-void Settings::addRow()
+void Settings::enableActionButtons()
+{
+    ui->tableView->selectRow(ui->tableView->currentIndex().row());
+    ui->btnEdit->setDisabled(false);
+    ui->btnRemove->setDisabled(false);
+}
+
+void Settings::on_btnAdd_clicked()
 {
     addWnd = new AddStore(*model, *ui->tableView, *sw);
     addWnd->setWindowIcon(QIcon(":/recources/images/Programs.png"));
@@ -48,7 +70,7 @@ void Settings::addRow()
     addWnd->show();
 }
 
-void Settings::editRow()
+void Settings::on_btnEdit_clicked()
 {
     editWnd = new EditStore(*model, *ui->tableView, *sw);
     editWnd->setWindowIcon(QIcon(":/recources/images/Programs.png"));
@@ -57,7 +79,7 @@ void Settings::editRow()
     editWnd->show();
 }
 
-void Settings::delRow()
+void Settings::on_btnRemove_clicked()
 {
     int currentRow = ui->tableView->currentIndex().row();
     QModelIndex indx = ui->tableView->model()->index(currentRow, CURR_PATH);
@@ -69,9 +91,22 @@ void Settings::delRow()
     ui->tableView->selectRow(currentRow-1);
 }
 
-void Settings::enableActionButtons()
+void Settings::tableContextMenuRequested(QPoint pos)
 {
-    ui->tableView->selectRow(ui->tableView->currentIndex().row());
-    ui->pbEdit->setDisabled(false);
-    ui->pdDel->setDisabled(false);
+    tableMenu = new QMenu(this);
+
+    filterAction = new QAction("Фильтр");
+    connect(filterAction, SIGNAL(triggered()),
+            this, SLOT(on_Action_SetFilter()));
+    tableMenu->addAction(filterAction);
+    tableMenu->popup(ui->tableView->viewport()->mapToGlobal(pos));
+}
+
+void Settings::on_Action_SetFilter()
+{
+    customFilter.insert(ui->tableView->currentIndex().column(),
+                        ui->tableView->currentIndex().data().toString());
+    foreach (filter, customFilter) {
+
+    }
 }

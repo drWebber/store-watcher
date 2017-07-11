@@ -1,5 +1,9 @@
 <RCC>
     <qresource prefix="/recources">
         <file>images/Programs.png</file>
+        <file>images/filter_add-64.png</file>
+        <file>images/configure.png</file>
+        <file>images/add.png</file>
+        <file>images/remove.png</file>
     </qresource>
 </RCC>

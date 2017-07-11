@@ -30,6 +30,8 @@ public slots:
 private slots:
     void showTrayIcon();
     void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
+    void on_btnSetFilter_triggered(bool checked);
+
 private:
     Ui::MainWindow *ui;
     Settings *settingsWnd;
