@@ -89,10 +89,10 @@
    </property>
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/recources/images/filter_add-64.png</normaloff>:/recources/images/filter_add-64.png</iconset>
+     <normaloff>:/recources/images/filter.png</normaloff>:/recources/images/filter.png</iconset>
    </property>
    <property name="text">
-    <string/>
+    <string> </string>
    </property>
    <property name="toolTip">
     <string>Установтиь фильтр</string>

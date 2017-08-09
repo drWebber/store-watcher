@@ -37,7 +37,8 @@ SOURCES += main.cpp\
     store-remainings/storewatcher.cpp \
     store-updater/storeupdater.cpp \
     xls/xlsreader.cpp \
-    delegates/rowcolorerdelegate.cpp
+    delegates/rowcolorerdelegate.cpp \
+    filters/sortfilteproxyrmodel.cpp
 
 HEADERS  += mainwindow.h \
     settings/settings.h \
@@ -50,7 +51,8 @@ HEADERS  += mainwindow.h \
     store-remainings/storewatcher.h \
     store-updater/storeupdater.h \
     xls/xlsreader.h \
-    delegates/rowcolorerdelegate.h
+    delegates/rowcolorerdelegate.h \
+    filters/sortfilteproxyrmodel.h
 
 FORMS    += mainwindow.ui \
     settings/settings.ui \

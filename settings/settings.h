@@ -7,7 +7,7 @@
 #include "settings/addstore.h"
 #include "settings/editstore.h"
 #include "store-remainings/storewatcher.h"
-#include <qsortfilterproxymodel.h>
+#include "filters/sortfilteproxyrmodel.h"
 
 namespace Ui {
 class Settings;
@@ -31,16 +31,20 @@ private slots:
    void on_btnRemove_clicked();
    void tableContextMenuRequested(QPoint pos);
    void on_Action_SetFilter();
+   void on_Action_RemoveFilter();
+   void on_btnSetFilter_clicked();
+
+   void on_btnUnSetFilter_clicked();
+
 private:
     Ui::Settings *ui;    
     QSqlRelationalTableModel *model;
     AddStore *addWnd;
     EditStore *editWnd;
     QMenu *tableMenu;
-    QSortFilterProxyModel *proxy;
+    SortFilterProxyModel *proxy;
     QAction *filterAction;
-    bool filterChecked = false;
-    QMap<int, QString> customFilter;
+    QAction *removeFilterAction;
 };
 
 #endif // SETTINGS_H
