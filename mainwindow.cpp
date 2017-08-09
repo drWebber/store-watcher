@@ -42,13 +42,12 @@ MainWindow::MainWindow(QWidget *parent) :
     //запрещаем редактирование
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableView->setModel(proxy);
-    ui->tableView->hideColumn(0);
-    ui->tableView->hideColumn(3);
-    ui->tableView->hideColumn(4);
-    ui->tableView->hideColumn(5);
-    ui->tableView->hideColumn(6);
-    ui->tableView->hideColumn(7);
-    ui->tableView->hideColumn(8);
+
+    QList<int> hiddenColumns;
+    hiddenColumns << 0 << 3 << 4 << 5 << 6 << 7 << 8;
+    foreach (int hideCol, hiddenColumns) {
+        ui->tableView->hideColumn(hideCol);
+    }
 
     rowColorerDelegate = new RowColorerDelegate(*proxy);
     ui->tableView->setItemDelegate(rowColorerDelegate);

@@ -1,6 +1,7 @@
 #include "settings.h"
 #include "ui_settings.h"
 #include <qdebug.h>
+
 #define CURR_PATH 5
 
 Settings::Settings(StoreWatcher &sw, QWidget *parent) :
@@ -30,7 +31,7 @@ Settings::Settings(StoreWatcher &sw, QWidget *parent) :
     model->setHeaderData(8, Qt::Horizontal, "Колонка кол-во");
     model->select();
 
-    proxy = new QSortFilterProxyModel();
+    proxy = new SortFilterProxyModel();
     proxy->setSourceModel(model);
 
     ui->btnEdit->setDisabled(true);
@@ -47,6 +48,10 @@ Settings::Settings(StoreWatcher &sw, QWidget *parent) :
     ui->btnRemove->setIconSize(btnSize);
     ui->btnEdit->setIcon(QIcon(":/recources/images/configure.png"));
     ui->btnEdit->setIconSize(btnSize);
+    ui->btnSetFilter->setIcon(QIcon(":/recources/images/filter.png"));
+    ui->btnSetFilter->setIconSize(btnSize);
+    ui->btnUnSetFilter->setIcon(QIcon(":/recources/images/filter-remove.png"));
+    ui->btnUnSetFilter->setIconSize(btnSize);
 }
 
 Settings::~Settings()
@@ -56,7 +61,6 @@ Settings::~Settings()
 
 void Settings::enableActionButtons()
 {
-    ui->tableView->selectRow(ui->tableView->currentIndex().row());
     ui->btnEdit->setDisabled(false);
     ui->btnRemove->setDisabled(false);
 }
@@ -95,18 +99,41 @@ void Settings::tableContextMenuRequested(QPoint pos)
 {
     tableMenu = new QMenu(this);
 
-    filterAction = new QAction("Фильтр");
+    filterAction = new QAction(QIcon(":/recources/images/filter.png"), "Фильтр", this);
     connect(filterAction, SIGNAL(triggered()),
             this, SLOT(on_Action_SetFilter()));
     tableMenu->addAction(filterAction);
+
+    removeFilterAction = new QAction("Снять фильтр");
+    connect(removeFilterAction,SIGNAL(triggered()),
+            this, SLOT(on_Action_RemoveFilter()));
+    tableMenu->addAction(removeFilterAction);
+
     tableMenu->popup(ui->tableView->viewport()->mapToGlobal(pos));
 }
 
 void Settings::on_Action_SetFilter()
 {
-    customFilter.insert(ui->tableView->currentIndex().column(),
-                        ui->tableView->currentIndex().data().toString());
-    foreach (filter, customFilter) {
+    proxy->addFilterFixedString(ui->tableView->currentIndex().column(),
+                                ui->tableView->currentIndex().data().toString());
+    ui->tableView->hideColumn(0);
+}
 
-    }
+void Settings::on_Action_RemoveFilter()
+{
+    proxy->removeFilter();
+    ui->tableView->hideColumn(0);
+}
+
+void Settings::on_btnSetFilter_clicked()
+{
+    proxy->addFilterFixedString(ui->tableView->currentIndex().column(),
+                                ui->tableView->currentIndex().data().toString());
+    ui->tableView->hideColumn(0);
+}
+
+void Settings::on_btnUnSetFilter_clicked()
+{
+    proxy->removeFilter();
+    ui->tableView->hideColumn(0);
 }
