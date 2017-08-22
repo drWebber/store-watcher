@@ -7,6 +7,8 @@
 #include <qdatetime.h>
 #include <qsystemtrayicon.h>
 
+#include <qsqlerror.h>
+
 StoreUpdater::StoreUpdater(QFileSystemWatcher &fsw, StoreRemainings &sr)
 {
     xlsFilePath = sr.getCurrentFilePath();
@@ -20,7 +22,7 @@ void StoreUpdater::update()
     qDebug() << "update event";
     XlsReader *xlsReader = new XlsReader();
     xlsReader->xlsToCsv(xlsFilePath, csvFilePath);
-
+    qDebug() << "csv saved";
     QSqlQuery statement;
     statement.exec("START TRANSACTION");
 
@@ -38,6 +40,7 @@ void StoreUpdater::update()
         QTextStream stream(&csvFile);
         for (int i(0); i < sr->getStartRow()-1; i++) stream.readLine(); //пропускаем нужное число строк
                                                                         //начало задано в бд остатков
+        int counter = 0;
         while(!stream.atEnd()){
            QString line = stream.readLine();
            QStringList item = line.split(";");
@@ -45,7 +48,13 @@ void StoreUpdater::update()
                statement.bindValue(":article", item[sr->getArticleCol()-1]);
                statement.bindValue(":smid", sr->getSmid());
                statement.bindValue(":qty", item[sr->getItemCountCol()-1]);
-               statement.exec();
+               if (!statement.exec()) {
+                   qDebug() << statement.lastError();
+               }
+               if(counter%100 == 0){
+                   qDebug() << "залито" << counter << "строк";
+               }
+               ++counter;
             }
             stream.flush();
         }

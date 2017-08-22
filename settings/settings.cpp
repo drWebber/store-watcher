@@ -16,7 +16,7 @@ Settings::Settings(StoreWatcher &sw, QWidget *parent) :
     this->sw = &sw;
 
     //запрещаем редактирование
-    ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    //ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     model = new QSqlRelationalTableModel();
     model->setTable("store_manufacturer");
