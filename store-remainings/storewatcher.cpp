@@ -59,12 +59,19 @@ void StoreWatcher::storeRemainsChanged(QString path)
 {
     if(!QFile::exists(path)) {
         qDebug() << "файл " + path + " недоступен";
-        StoreRemainings *tmp = getStoreRemainings(path);
-        emit fileIsBusy(tmp->getSmid());
-        StoreUpdater *su = new StoreUpdater(*fsw, *tmp);
-        su->start();
-        connect(su, SIGNAL(updateFinished(StoreRemainings*)), this, SLOT(threadFinished(StoreRemainings*)), Qt::QueuedConnection);
+        updateRemainings(path);
     }
+}
+
+void StoreWatcher::updateRemainings(QString path)
+{
+    StoreRemainings *tmp = getStoreRemainings(path);
+    emit fileIsBusy(tmp->getSmid());
+    StoreUpdater *su = new StoreUpdater(*fsw, *tmp);
+    su->start();
+    connect(su, SIGNAL(updateFinished(StoreRemainings*)),
+            this, SLOT(threadFinished(StoreRemainings*)),
+            Qt::QueuedConnection);
 }
 
 void StoreWatcher::threadFinished(StoreRemainings* sr)

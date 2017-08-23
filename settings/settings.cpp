@@ -109,6 +109,11 @@ void Settings::tableContextMenuRequested(QPoint pos)
             this, SLOT(on_Action_RemoveFilter()));
     tableMenu->addAction(removeFilterAction);
 
+    refreshRemainings = new QAction("Обновить остатки");
+    connect(refreshRemainings, SIGNAL(triggered()),
+            this, SLOT(on_Action_Refresh()));
+    tableMenu->addAction(refreshRemainings);
+
     tableMenu->popup(ui->tableView->viewport()->mapToGlobal(pos));
 }
 
@@ -123,6 +128,13 @@ void Settings::on_Action_RemoveFilter()
 {
     proxy->removeFilter();
     ui->tableView->hideColumn(0);
+}
+
+void Settings::on_Action_Refresh()
+{
+    QModelIndex indx = model->index(ui->tableView->currentIndex().row(), 5);
+    QString path = model->data(indx).toString();
+    sw->updateRemainings(path);
 }
 
 void Settings::on_btnSetFilter_clicked()

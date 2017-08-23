@@ -32,8 +32,8 @@ private slots:
    void tableContextMenuRequested(QPoint pos);
    void on_Action_SetFilter();
    void on_Action_RemoveFilter();
+   void on_Action_Refresh();
    void on_btnSetFilter_clicked();
-
    void on_btnUnSetFilter_clicked();
 
 private:
@@ -45,6 +45,7 @@ private:
     SortFilterProxyModel *proxy;
     QAction *filterAction;
     QAction *removeFilterAction;
+    QAction *refreshRemainings;
 };
 
 #endif // SETTINGS_H

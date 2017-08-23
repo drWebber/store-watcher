@@ -13,8 +13,9 @@ public:
     void setUp();
     void addFile(QString filePath);
     void removeFile(QString filePath);
-private slots:
     void storeRemainsChanged(QString path);
+    void updateRemainings(QString path);
+private slots:
     void threadFinished(StoreRemainings *sr);
 signals:
     int fileIsBusy(int smid);
