@@ -5,6 +5,8 @@
 #include <qthread.h>
 #include "store-remainings/storeremainings.h"
 #include <qfilesystemwatcher.h>
+#include <qsqlquery.h>
+#include <qsqlerror.h>
 
 class StoreUpdater : public QThread
 {
@@ -13,6 +15,7 @@ public:
     StoreUpdater(QFileSystemWatcher &fsw, StoreRemainings &sr);
     void update();
     void run();
+    QSqlDatabase getConnection();
 private:
     void updateCsvFilePath(QString xlsFilePath);
 signals:

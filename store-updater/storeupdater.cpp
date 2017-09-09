@@ -1,7 +1,5 @@
 #include "storeupdater.h"
 #include <qregularexpression.h>
-#include <qsqlquery.h>
-#include <qsqlerror.h>
 #include <qfileinfo.h>
 #include <qdatetime.h>
 #include <qsystemtrayicon.h>
@@ -32,8 +30,6 @@ void StoreUpdater::update()
     CsvReader cr(csvFile, sr->getStartRow() - 1);
     QList<int> productInfo = QList<int>() << sr->getArticleCol() - 1
                                           << sr->getItemCountCol() -1;
-    qDebug() << sr->getItemCountCol();
-
     DataParcer prodParcer(productInfo);
     DataWriter prodWriter;
     if (!prodWriter.open(csvFile->fileName() + ".txt")) {
@@ -57,58 +53,32 @@ void StoreUpdater::update()
     }
     prodWriter.flush();
 
-//    "LOAD DATA INFILE '" + prodWriter.getFilePath()
-//                + "' INTO TABLE `store`(@pid, `smid`, `count`)"
-//                  "SET pid = (SELECT `pid` FROM `products` WHERE article = @pid)";
+    QSqlDatabase conn = getConnection();
+    QSqlQuery query(conn);
+    query.exec("SET autocommit=0");
+    query.exec("START TRANSACTION");
 
+    query.prepare("DELETE FROM store WHERE smid = :smid");
+    query.bindValue(":smid", sr->getSmid());
+    query.exec();
 
-/*
-    QSqlQuery statement;
-    statement.exec("START TRANSACTION");
-
-    //удаляем устаревшие остатки
-    statement.prepare("DELETE FROM store WHERE smid = :smid");
-    statement.bindValue(":smid", sr->getSmid());
-    statement.exec();
-
-    //заливаем новые остатки
-    statement.prepare("INSERT INTO store(pid, smid, count) VALUES ((SELECT pid FROM products WHERE art = :article), :smid, :qty)");
-
-    //читаем csv
-    QFile csvFile(csvFilePath);
-    if(csvFile.open(QFile::ReadOnly | QFile::Text)) {
-        QTextStream stream(&csvFile);
-        for (int i(0); i < sr->getStartRow()-1; i++) stream.readLine(); //пропускаем нужное число строк
-                                                                        //начало задано в бд остатков
-        int counter = 0;
-        while(!stream.atEnd()){
-           QString line = stream.readLine();
-           QStringList item = line.split(";");
-           if (item[sr->getArticleCol()-1] == "") continue;
-               statement.bindValue(":article", item[sr->getArticleCol()-1]);
-               statement.bindValue(":smid", sr->getSmid());
-               statement.bindValue(":qty", item[sr->getItemCountCol()-1]);
-               if (!statement.exec()) {
-                   qDebug() << statement.lastError();
-               }
-               if(counter%100 == 0){
-                   qDebug() << "залито" << counter << "строк";
-               }
-               ++counter;
-            }
-            stream.flush();
-        }
-    statement.exec("COMMIT");
-    csvFile.close();
-    csvFile.remove();
+    if (!query.exec("LOAD DATA INFILE '" + prodWriter.getFilePath()
+                                    + "' INTO TABLE `store`(@pid, `smid`, `count`) "
+                                      "SET pid = (SELECT `pid` FROM `products` WHERE `art` = @pid)")) {
+        emit importError(query.lastError().text());
+    }
 
     //обновляем инфо о дате обновленного файла остатков (таблица StoreDate)
     QFileInfo fileInfo(xlsFilePath);
-    statement.prepare("UPDATE StoreDate SET date = :creationDate WHERE smid = :smid");
-    statement.bindValue(":creationDate", fileInfo.created().toString("dd.MM.yyyy"));
-    statement.bindValue(":smid", sr->getSmid());
-    statement.exec();
-    */
+    query.prepare("UPDATE `store_date` SET date = :creationDate WHERE smid = :smid");
+    query.bindValue(":creationDate", fileInfo.created().toString("yyyy-MM-dd"));
+    query.bindValue(":smid", sr->getSmid());
+    if (!query.exec()) {
+        emit importError(query.lastError().text());
+    }
+
+    query.exec("COMMIT");
+    conn.close();
 }
 
 void StoreUpdater::run()
@@ -146,5 +116,19 @@ void StoreUpdater::run()
 void StoreUpdater::updateCsvFilePath(QString xlsFilePath)
 {
     csvFilePath = xlsFilePath.replace(QRegularExpression(".xlsx?"), ".csv").replace("/", "\\");
+}
+
+QSqlDatabase StoreUpdater::getConnection()
+{
+    QSqlDatabase conn = QSqlDatabase::addDatabase("QMYSQL3", sr->getCurrentFilePath());
+    conn.setHostName("localhost");
+    conn.setDatabaseName("nordelectro");
+    conn.setUserName("root");
+
+    if (!conn.open()) {
+        qDebug() << "Failed to connect!";
+        return QSqlDatabase();
+    }
+    return conn;
 }
 

@@ -1,22 +1,13 @@
 #include "datawriter.h"
 #include <qfileinfo.h>
 
-#include <qmessagebox.h>
-#include <qdebug.h>
-
 DataWriter::DataWriter()
 {
-
 }
 
 DataWriter::~DataWriter()
 {
-    //file.remove();
-}
-
-void DataWriter::append(QString line)
-{
-    *stream << line << '\n';
+    file.remove();
 }
 
 bool DataWriter::open(const QString &tmpFileName)
@@ -30,6 +21,11 @@ bool DataWriter::open(const QString &tmpFileName)
     stream->setCodec("UTF-8");
 
     return true;
+}
+
+void DataWriter::append(QString line)
+{
+    *stream << line << '\n';
 }
 
 void DataWriter::flush()

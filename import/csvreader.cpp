@@ -9,7 +9,7 @@ CsvReader::CsvReader(QFile *csvFile, int startRow)
 CsvReader::~CsvReader()
 {
     csvFile->close();
-    //csvFile->remove();
+    csvFile->remove();
 }
 
 QString CsvReader::readLine()

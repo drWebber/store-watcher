@@ -33,6 +33,8 @@ void StoreWatcher::setUp()
             tmp->updateCurrentFile();
             emit fileIsBusy(tmp->getSmid());
             StoreUpdater *su = new StoreUpdater(*fsw, *tmp);
+            connect(su, SIGNAL(importError(QString)),
+                    this, SLOT(on_importError(QString)));
             su->start();
             connect(su, SIGNAL(updateFinished(StoreRemainings*)), this, SLOT(threadFinished(StoreRemainings*)), Qt::QueuedConnection);
         } else {
@@ -62,14 +64,23 @@ void StoreWatcher::storeRemainsChanged(QString path)
         StoreRemainings *tmp = getStoreRemainings(path);
         emit fileIsBusy(tmp->getSmid());
         StoreUpdater *su = new StoreUpdater(*fsw, *tmp);
+        connect(su, SIGNAL(importError(QString)),
+                this, SLOT(on_importError(QString)));
+        connect(su, SIGNAL(updateFinished(StoreRemainings*)),
+                this, SLOT(threadFinished(StoreRemainings*)), Qt::QueuedConnection);
         su->start();
-        connect(su, SIGNAL(updateFinished(StoreRemainings*)), this, SLOT(threadFinished(StoreRemainings*)), Qt::QueuedConnection);
+
     }
 }
 
 void StoreWatcher::threadFinished(StoreRemainings* sr)
 {
     emit updateFinished(sr);
+}
+
+void StoreWatcher::on_importError(QString msg)
+{
+    QMessageBox::critical(NULL, "Ошибка импорта", msg);
 }
 
 StoreRemainings *StoreWatcher::getStoreRemainings(QString path)
