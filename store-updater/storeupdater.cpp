@@ -1,13 +1,16 @@
 #include "storeupdater.h"
-#include "xls/xlsreader.h"
 #include <qregularexpression.h>
-#include <qdebug.h>
 #include <qsqlquery.h>
+#include <qsqlerror.h>
 #include <qfileinfo.h>
 #include <qdatetime.h>
 #include <qsystemtrayicon.h>
+#include "excel/xlsreader.h"
+#include "import/csvreader.h"
+#include "import/dataparcer.h"
+#include "import/datawriter.h"
 
-#include <qsqlerror.h>
+#include <qdebug.h>
 
 StoreUpdater::StoreUpdater(QFileSystemWatcher &fsw, StoreRemainings &sr)
 {
@@ -20,9 +23,46 @@ StoreUpdater::StoreUpdater(QFileSystemWatcher &fsw, StoreRemainings &sr)
 void StoreUpdater::update()
 {
     qDebug() << "update event";
-    XlsReader *xlsReader = new XlsReader();
-    xlsReader->xlsToCsv(xlsFilePath, csvFilePath);
-    qDebug() << "csv saved";
+
+    XlsReader xr(new QFile(sr->getCurrentFilePath()));
+    xr.openActiveWorkBook();
+    QFile *csvFile = xr.saveAsCsv();
+    xr.close();
+
+    CsvReader cr(csvFile, sr->getStartRow() - 1);
+    QList<int> productInfo = QList<int>() << sr->getArticleCol() - 1
+                                          << sr->getItemCountCol() -1;
+    qDebug() << sr->getItemCountCol();
+
+    DataParcer prodParcer(productInfo);
+    DataWriter prodWriter;
+    if (!prodWriter.open(csvFile->fileName() + ".txt")) {
+        emit importError("Ошибка открытия файла" + csvFile->fileName() + ".txt");
+        return;
+    }
+
+    QString smid = QString::number(sr->getSmid());
+
+    if (cr.openCsv()) {
+        while (!cr.atEnd()) {
+            QString line = prodParcer.parceLine(cr.readLine());
+            if (!line.isEmpty()) {
+                line.replace(QRegularExpression("^(.+?)\t"), "\\1\t" + smid + '\t');
+                prodWriter.append(line);
+            }
+        }
+    } else {
+        emit importError("Не удалось прочитать csv...");
+        return;
+    }
+    prodWriter.flush();
+
+//    "LOAD DATA INFILE '" + prodWriter.getFilePath()
+//                + "' INTO TABLE `store`(@pid, `smid`, `count`)"
+//                  "SET pid = (SELECT `pid` FROM `products` WHERE article = @pid)";
+
+
+/*
     QSqlQuery statement;
     statement.exec("START TRANSACTION");
 
@@ -68,6 +108,7 @@ void StoreUpdater::update()
     statement.bindValue(":creationDate", fileInfo.created().toString("dd.MM.yyyy"));
     statement.bindValue(":smid", sr->getSmid());
     statement.exec();
+    */
 }
 
 void StoreUpdater::run()

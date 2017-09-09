@@ -17,6 +17,7 @@ private:
     void updateCsvFilePath(QString xlsFilePath);
 signals:
     StoreRemainings *updateFinished(StoreRemainings *sr);
+    QString importError(QString msg);
 private:
     QString xlsFilePath;
     QString csvFilePath;
