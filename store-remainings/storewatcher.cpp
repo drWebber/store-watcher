@@ -82,6 +82,11 @@ void StoreWatcher::threadFinished(StoreRemainings* sr)
     emit updateFinished(sr);
 }
 
+void StoreWatcher::on_importError(QString msg)
+{
+    QMessageBox::critical(NULL, "Ошибка импорта", msg);
+}
+
 
 
 StoreRemainings *StoreWatcher::getStoreRemainings(QString path)
