@@ -2,6 +2,8 @@
 #include "ui_actionwnd.h"
 
 #include <qfile.h>
+#include <qdebug.h>
+#include <qsqlerror.h>
 
 AddStore::AddStore(QSqlRelationalTableModel &model, QTableView &tableView, StoreWatcher &sw, QWidget *parent) :
     ActionWnd(model, tableView, sw, parent)
@@ -22,5 +24,9 @@ void AddStore::beforeSubmit()
     query.prepare("INSERT INTO store_date(smid) VALUES((SELECT smid FROM store_manufacturer WHERE mid = (SELECT mid FROM manufacturers WHERE name = :manName) AND storePlace = :storePlace))");
     query.bindValue(":manName", ui->cmbManufacturer->currentText());
     query.bindValue(":storePlace", ui->cmbStorePlacement->currentText());
-    query.exec();
+    if (!query.exec()) {
+        qDebug() << "AddStore::beforeSubmit() error:";
+        qDebug() << query.lastError();
+        qDebug() << query.lastQuery();
+    }
 }

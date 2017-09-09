@@ -38,32 +38,32 @@ ActionWnd::~ActionWnd()
 
 void ActionWnd::setModelData()
 {
-    QModelIndex indx = tableView->model()->index(currentRow, STOREPLACE_COL);
+    QModelIndex indx = model->index(currentRow, STOREPLACE_COL);
     model->setData(indx, ui->cmbStorePlacement->currentText());
 
     QSqlQuery sq;
-    sq.prepare("SELECT mid FROM manufacturers WHERE name = :name;");
+    sq.prepare("SELECT `mid` FROM manufacturers WHERE name = :name;");
     sq.bindValue(":name", ui->cmbManufacturer->currentText());    
     QString mid = query.getSingleVal(sq).toString();
-    indx = tableView->model()->index(currentRow, MANUFACTURER_COL);
+    indx = model->index(currentRow, MANUFACTURER_COL);
     model->setData(indx, mid);
 
-    indx = tableView->model()->index(currentRow, DIRPATH_COL);
+    indx = model->index(currentRow, DIRPATH_COL);
     model->setData(indx, ui->leCurrentDir->text());
 
-    indx = tableView->model()->index(currentRow, REGEXP_COL);
+    indx = model->index(currentRow, REGEXP_COL);
     model->setData(indx, ui->leRegExp->text());
 
-    indx = tableView->model()->index(currentRow, CURR_PATH);
+    indx = model->index(currentRow, CURR_PATH);
     model->setData(indx, getFilePath());
 
-    indx = tableView->model()->index(currentRow, START_ROW);
+    indx = model->index(currentRow, START_ROW);
     model->setData(indx, ui->sbStartRow->text());
 
-    indx = tableView->model()->index(currentRow, ARTICLE_COL);
+    indx = model->index(currentRow, ARTICLE_COL);
     model->setData(indx, ui->sbArticle->text());
 
-    indx = tableView->model()->index(currentRow, ITEM_COUNT_COL);
+    indx = model->index(currentRow, ITEM_COUNT_COL);
     model->setData(indx, ui->sbItemCount->text());
 }
 
@@ -96,10 +96,13 @@ void ActionWnd::tryRegExp()
 
 void ActionWnd::submitClicked()
 {
+    qDebug() << "submitClicked";
     QFile rFile(getFilePath());
     if (rFile.exists()) {
         this->setModelData();
         model->submit();
+        qDebug() << "ActionWnd::submitClicked()"
+                 << model->lastError();
 
         sw->addFile(getFilePath());
 
