@@ -17,6 +17,7 @@ public:
     void updateRemainings(QString path);
 private slots:
     void threadFinished(StoreRemainings *sr);
+    void on_importError(QString msg);
 signals:
     int fileIsBusy(int smid);
     StoreRemainings *updateFinished(StoreRemainings *sr);
