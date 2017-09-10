@@ -20,7 +20,13 @@ StoreUpdater::StoreUpdater(QFileSystemWatcher &fsw, StoreRemainings &sr)
 
 void StoreUpdater::update()
 {
-    qDebug() << "update event";
+    qDebug() << getCurrentTime() << "обновление остатков" << sr->getCurrentFilePath();
+
+    QSqlDatabase conn = getConnection();
+    if (!conn.isValid()) {
+        qDebug() << "Обновление" + sr->getCurrentFilePath() + "уже запущено";
+        return;
+    }
 
     XlsReader xr(new QFile(sr->getCurrentFilePath()));
     xr.openActiveWorkBook();
@@ -53,7 +59,6 @@ void StoreUpdater::update()
     }
     prodWriter.flush();
 
-    QSqlDatabase conn = getConnection();
     QSqlQuery query(conn);
     query.exec("SET autocommit=0");
     query.exec("START TRANSACTION");
@@ -64,7 +69,7 @@ void StoreUpdater::update()
 
     if (!query.exec("LOAD DATA INFILE '" + prodWriter.getFilePath()
                                     + "' INTO TABLE `store`(@pid, `smid`, `count`) "
-                                      "SET pid = (SELECT `pid` FROM `products` WHERE `art` = @pid)")) {
+                                      "SET pid = (SELECT `pid` FROM `products` WHERE `art` = @pid AND `mid` = " + QString::number(sr->getMid()) + ")")) {
         emit importError(query.lastError().text());
     }
 
@@ -79,11 +84,12 @@ void StoreUpdater::update()
 
     query.exec("COMMIT");
     conn.close();
+
+    qDebug() << getCurrentTime() << "обновление остатков" << sr->getCurrentFilePath() << "завершено";
 }
 
 void StoreUpdater::run()
 {
-    qDebug() << "yeeeehhh, we are in thread";
     int timeFreezeKoef = 1;
     do {
         QThread::sleep(15*timeFreezeKoef);
@@ -130,5 +136,10 @@ QSqlDatabase StoreUpdater::getConnection()
         return QSqlDatabase();
     }
     return conn;
+}
+
+QString StoreUpdater::getCurrentTime()
+{
+    return QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
 }
 

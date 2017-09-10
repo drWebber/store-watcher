@@ -100,17 +100,17 @@ void Settings::tableContextMenuRequested(QPoint pos)
     tableMenu = new QMenu(this);
 
     filterAction = new QAction(QIcon(":/recources/images/filter.png"), "Фильтр", this);
-    connect(filterAction, SIGNAL(triggered()),
+    connect(filterAction, SIGNAL(triggered(bool)),
             this, SLOT(on_Action_SetFilter()));
     tableMenu->addAction(filterAction);
 
     removeFilterAction = new QAction("Снять фильтр");
-    connect(removeFilterAction,SIGNAL(triggered()),
+    connect(removeFilterAction,SIGNAL(triggered(bool)),
             this, SLOT(on_Action_RemoveFilter()));
     tableMenu->addAction(removeFilterAction);
 
     refreshRemainings = new QAction("Обновить остатки");
-    connect(refreshRemainings, SIGNAL(triggered()),
+    connect(refreshRemainings, SIGNAL(triggered(bool)),
             this, SLOT(on_Action_Refresh()));
     tableMenu->addAction(refreshRemainings);
 

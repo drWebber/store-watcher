@@ -16,8 +16,7 @@ public:
     void update();
     void run();
     QSqlDatabase getConnection();
-private:
-    void updateCsvFilePath(QString xlsFilePath);
+    QString getCurrentTime();
 signals:
     StoreRemainings *updateFinished(StoreRemainings *sr);
     QString importError(QString msg);
@@ -27,6 +26,7 @@ private:
     int rowCount = -1;
     QFileSystemWatcher *fsw;
     StoreRemainings *sr;
+    void updateCsvFilePath(QString xlsFilePath);
 };
 
 #endif // STOREUPDATER_H

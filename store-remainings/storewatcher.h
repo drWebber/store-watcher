@@ -13,11 +13,11 @@ public:
     void setUp();
     void addFile(QString filePath);
     void removeFile(QString filePath);
-    void storeRemainsChanged(QString path);
     void updateRemainings(QString path);
 private slots:
     void threadFinished(StoreRemainings *sr);
     void on_importError(QString msg);
+    void storeRemainsChanged(QString path);
 signals:
     int fileIsBusy(int smid);
     StoreRemainings *updateFinished(StoreRemainings *sr);

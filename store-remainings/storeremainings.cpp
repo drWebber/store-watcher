@@ -60,3 +60,8 @@ int StoreRemainings::getItemCountCol()
 {
     return itemCountCol;
 }
+
+int StoreRemainings::getMid() const
+{
+    return mid;
+}

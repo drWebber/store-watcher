@@ -13,6 +13,7 @@ public:
     int getStartRow();
     int getArticleCol();
     int getItemCountCol();
+    int getMid() const;
 private:
     QString currentFilePath;
     int smid;
