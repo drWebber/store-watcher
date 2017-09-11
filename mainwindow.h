@@ -4,8 +4,9 @@
 #include <QMainWindow>
 #include "settings/settings.h"
 #include "store-remainings/storeremainings.h"
-#include <QtSql/qsqlrelationaltablemodel.h>
-#include "delegates/rowcolorerdelegate.h"
+#include <QtSql/qsqlquerymodel.h>
+#include <qsortfilterproxymodel.h>
+#include "models/coloredsqlquerymodel.h"
 #include <qmenu.h>
 #include <qsystemtrayicon.h>
 
@@ -35,22 +36,17 @@ private slots:
 private:
     Ui::MainWindow *ui;
     Settings *settingsWnd;
-    QSqlRelationalTableModel *model;
+    ColoredSqlQueryModel *model;
     QSortFilterProxyModel *proxy;
     StoreWatcher *sw;
-    RowColorerDelegate *rowColorerDelegate;
     QSystemTrayIcon *trayIcon;
     QMenu *trayMenu;
     QAction *showAction;
     QAction *hideAction;
     QAction *quitAction;
-
-    // QWidget interface
+    enum Column {SMID, MANUFACTURER, PLACE, DATE};
 protected:
     void changeEvent(QEvent *event) override;
-
-    // QWidget interface
-protected:
     void closeEvent(QCloseEvent *event) override;
 };
 

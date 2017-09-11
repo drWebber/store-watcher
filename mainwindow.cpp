@@ -2,15 +2,16 @@
 #include "ui_mainwindow.h"
 #include "sql/sqlconnector.h"
 #include "store-remainings/storewatcher.h"
-#include <qdebug.h>
 #include <QTime>
 #include <qfile.h>
 #include <qdir.h>
 #include <QtSql/qsqlquery.h>
 #include <qurl.h>
 #include <qdesktopservices.h>
-#include <qsortfilterproxymodel.h>
 #include <QCloseEvent>
+
+#include <QModelIndexList>
+#include <qdebug.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -28,35 +29,33 @@ MainWindow::MainWindow(QWidget *parent) :
     QSqlQuery query;
     query.exec("SET NAMES 'cp1251'");
 
-    model = new QSqlRelationalTableModel();
-    model->setTable("store_manufacturer");
-    model->setRelation(2, QSqlRelation("manufacturers", "mid", "name"));
-    model->select();
+    model = new ColoredSqlQueryModel(this);
+    model->setQuery("SELECT sm.smid, mn.name, sm.storePlace, sd.date "
+                    "FROM `store_manufacturer` AS sm LEFT JOIN `store_date` AS sd ON sm.smid = sd.smid, `manufacturers` AS mn "
+                    "WHERE sm.mid = mn.mid");
 
     proxy = new QSortFilterProxyModel(this);
     proxy->setSourceModel(model);
 
-    proxy->setHeaderData(1, Qt::Horizontal, "Расположение");
-    proxy->setHeaderData(2, Qt::Horizontal, "Производитель");
+    proxy->setHeaderData(Column::MANUFACTURER, Qt::Horizontal, "Производитель");
+    proxy->setHeaderData(Column::PLACE, Qt::Horizontal, "Расположение");
+    proxy->setHeaderData(Column::DATE, Qt::Horizontal, "Дата");
+
 
     //запрещаем редактирование
-    ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+//    ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableView->setModel(proxy);
 
-    QList<int> hiddenColumns;
-    hiddenColumns << 0 << 3 << 4 << 5 << 6 << 7 << 8;
-    foreach (int hideCol, hiddenColumns) {
-        ui->tableView->hideColumn(hideCol);
-    }
+    ui->tableView->hideColumn(Column::SMID);
 
-    rowColorerDelegate = new RowColorerDelegate(*proxy);
-    ui->tableView->setItemDelegate(rowColorerDelegate);
     proxy->sort(2, Qt::AscendingOrder);
     ui->tableView->update();
 
     sw = new StoreWatcher();
-    connect(sw, SIGNAL(fileIsBusy(int)), this, SLOT(markBusyFile(int))); // slot
-    connect(sw, SIGNAL(updateFinished(StoreRemainings*)), this, SLOT(markUpdatedFile(StoreRemainings*)));
+    connect(sw, SIGNAL(fileIsBusy(int)),
+            this, SLOT(markBusyFile(int)));
+    connect(sw, SIGNAL(updateFinished(StoreRemainings*)),
+            this, SLOT(markUpdatedFile(StoreRemainings*)));
     sw->setUp();
 
     this->setTrayIconActions();
@@ -92,24 +91,33 @@ void MainWindow::executeFile()
 
 void MainWindow::updateTable()
 {
-    model->select();
+    model->query();
 }
 
 void MainWindow::markBusyFile(int smid)
 {
-    rowColorerDelegate->setSmIdColor(smid, "gray");
-    model->select();
+    qDebug() << "markBusy smid:" << smid;
+    QModelIndexList findIndexes = proxy->match(proxy->index(0, Column::SMID),
+                                               Qt::DisplayRole,
+                                               QVariant(smid), 1);
+    if (!findIndexes.isEmpty()) {
+        for (int i = 0; i < proxy->columnCount(); ++i) {
+            proxy->setData(proxy->index(findIndexes.at(0).row(), i),
+                           QColor(Qt::gray),
+                           Qt::TextColorRole);
+        }
+    }
 }
 
 void MainWindow::markUpdatedFile(StoreRemainings *sr)
 {
-    if(sr->getCurrentFilePath().isEmpty()){
-        rowColorerDelegate->unsetSmidColor(sr->getSmid());
-        rowColorerDelegate->setSmIdColor(sr->getSmid(), "red");
-    } else{
-        rowColorerDelegate->unsetSmidColor(sr->getSmid());
-    }
-    model->select();
+//    if(sr->getCurrentFilePath().isEmpty()){
+//        rowColorerDelegate->unsetSmidColor(sr->getSmid());
+//        rowColorerDelegate->setSmIdColor(sr->getSmid(), "red");
+//    } else{
+//        rowColorerDelegate->unsetSmidColor(sr->getSmid());
+//    }
+//    model->select();
 }
 
 void MainWindow::setTrayIconActions()
