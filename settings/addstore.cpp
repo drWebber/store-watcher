@@ -21,7 +21,7 @@ void AddStore::setUp()
 void AddStore::beforeSubmit()
 {
     QSqlQuery query;
-    query.prepare("INSERT INTO store_date(smid) VALUES((SELECT smid FROM store_manufacturer WHERE mid = (SELECT mid FROM manufacturers WHERE name = :manName) AND storePlace = :storePlace))");
+    query.prepare("INSERT INTO `store_date`(smid) VALUES((SELECT smid FROM store_manufacturer WHERE mid = (SELECT mid FROM `manufacturers` WHERE name = :manName) AND storePlace = :storePlace))");
     query.bindValue(":manName", ui->cmbManufacturer->currentText());
     query.bindValue(":storePlace", ui->cmbStorePlacement->currentText());
     if (!query.exec()) {

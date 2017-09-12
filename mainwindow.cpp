@@ -27,7 +27,11 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     QSqlQuery query;
-    query.exec("SET NAMES 'cp1251'");
+    query.exec("SET character_set_client=cp1251");
+    query.exec("SET character_set_connection=UTF8");
+    query.exec("SET character_set_results=cp1251");
+
+    query.exec("SET character_set_database=UTF8");
 
     model = new ColoredSqlQueryModel(this);
     model->setQuery("SELECT sm.smid, mn.name, sm.storePlace, sd.date "
@@ -94,15 +98,24 @@ void MainWindow::updateTable()
     model->query();
 }
 
-void MainWindow::markBusyFile(int smid)
+//const QModelIndex &MainWindow::findIndex(int smid)
+QModelIndex MainWindow::findIndex(int smid)
 {
-    qDebug() << "markBusy smid:" << smid;
     QModelIndexList findIndexes = proxy->match(proxy->index(0, Column::SMID),
                                                Qt::DisplayRole,
                                                QVariant(smid), 1);
-    if (!findIndexes.isEmpty()) {
+    if (findIndexes.isEmpty()) {
+        return *(new QModelIndex());
+    }
+    return findIndexes.at(0);
+}
+
+void MainWindow::markBusyFile(int smid)
+{
+    QModelIndex indx = findIndex(smid);
+    if (indx.isValid()) {
         for (int i = 0; i < proxy->columnCount(); ++i) {
-            proxy->setData(proxy->index(findIndexes.at(0).row(), i),
+            proxy->setData(proxy->index(indx.row(), i),
                            QColor(Qt::gray),
                            Qt::TextColorRole);
         }
@@ -111,13 +124,22 @@ void MainWindow::markBusyFile(int smid)
 
 void MainWindow::markUpdatedFile(StoreRemainings *sr)
 {
-//    if(sr->getCurrentFilePath().isEmpty()){
-//        rowColorerDelegate->unsetSmidColor(sr->getSmid());
-//        rowColorerDelegate->setSmIdColor(sr->getSmid(), "red");
-//    } else{
-//        rowColorerDelegate->unsetSmidColor(sr->getSmid());
-//    }
-//    model->select();
+    QModelIndex indx = findIndex(sr->getSmid());
+    if (indx.isValid()) {
+        if(sr->getCurrentFilePath().isEmpty()){
+            for (int i = 0; i < proxy->columnCount(); ++i) {
+                proxy->setData(proxy->index(indx.row(), i),
+                               QColor(Qt::red),
+                               Qt::TextColorRole);
+            }
+        } else{
+            for (int i = 0; i < proxy->columnCount(); ++i) {
+                proxy->setData(proxy->index(indx.row(), i),
+                               QColor(Qt::black),
+                               Qt::TextColorRole);
+            }
+        }
+    }
 }
 
 void MainWindow::setTrayIconActions()

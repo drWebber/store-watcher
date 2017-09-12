@@ -21,6 +21,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    QModelIndex findIndex(int smid);
 public slots:
     void showSettingsWnd();
     void executeFile();

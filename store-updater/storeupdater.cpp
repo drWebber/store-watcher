@@ -68,7 +68,7 @@ void StoreUpdater::update()
     query.exec();
 
     if (!query.exec("LOAD DATA INFILE '" + prodWriter.getFilePath()
-                                    + "' INTO TABLE `store`(@pid, `smid`, `count`) "
+                                    + "' IGNORE INTO TABLE `store`(@pid, `smid`, `count`) "
                                       "SET pid = (SELECT `pid` FROM `products` WHERE `art` = @pid AND `mid` = " + QString::number(sr->getMid()) + ")")) {
         emit importError(query.lastError().text());
     }

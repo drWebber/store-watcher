@@ -10,7 +10,7 @@ public:
     QVariant data(const QModelIndex &index, int role) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role);
 private:
-    QVector<QColor*> *columnColor;
+    QVector<QColor*> *columnColor; //почуму указатель *columnColor
 };
 
 #endif // COLOREDSQLQUERYMODEL_H
