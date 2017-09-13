@@ -101,36 +101,36 @@ void Settings::tableContextMenuRequested(QPoint pos)
 
     filterAction = new QAction(QIcon(":/recources/images/filter.png"), "Фильтр", this);
     connect(filterAction, SIGNAL(triggered(bool)),
-            this, SLOT(on_Action_SetFilter()));
+            this, SLOT(on_setFilter()));
     tableMenu->addAction(filterAction);
 
-    removeFilterAction = new QAction("Снять фильтр");
+    removeFilterAction = new QAction("Снять фильтр", this);
     connect(removeFilterAction,SIGNAL(triggered(bool)),
-            this, SLOT(on_Action_RemoveFilter()));
+            this, SLOT(on_removeFilter()));
     tableMenu->addAction(removeFilterAction);
 
-    refreshRemainings = new QAction("Обновить остатки");
+    refreshRemainings = new QAction("Обновить остатки", this);
     connect(refreshRemainings, SIGNAL(triggered(bool)),
-            this, SLOT(on_Action_Refresh()));
+            this, SLOT(on_refresh()));
     tableMenu->addAction(refreshRemainings);
 
     tableMenu->popup(ui->tableView->viewport()->mapToGlobal(pos));
 }
 
-void Settings::on_Action_SetFilter()
+void Settings::on_setFilter()
 {
     proxy->addFilterFixedString(ui->tableView->currentIndex().column(),
                                 ui->tableView->currentIndex().data().toString());
     ui->tableView->hideColumn(0);
 }
 
-void Settings::on_Action_RemoveFilter()
+void Settings::on_removeFilter()
 {
     proxy->removeFilter();
     ui->tableView->hideColumn(0);
 }
 
-void Settings::on_Action_Refresh()
+void Settings::on_refresh()
 {
     QModelIndex indx = model->index(ui->tableView->currentIndex().row(), 5);
     QString path = model->data(indx).toString();

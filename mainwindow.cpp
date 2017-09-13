@@ -5,7 +5,7 @@
 #include <QTime>
 #include <qfile.h>
 #include <qdir.h>
-#include <QtSql/qsqlquery.h>
+#include <qsqlquery.h>
 #include <qurl.h>
 #include <qdesktopservices.h>
 #include <QCloseEvent>
@@ -34,23 +34,21 @@ MainWindow::MainWindow(QWidget *parent) :
     query.exec("SET character_set_database=UTF8");
 
     model = new ColoredSqlQueryModel(this);
-    model->setQuery("SELECT sm.smid, mn.name, sm.storePlace, sd.date "
-                    "FROM `store_manufacturer` AS sm LEFT JOIN `store_date` AS sd ON sm.smid = sd.smid, `manufacturers` AS mn "
-                    "WHERE sm.mid = mn.mid");
+    updateTable();
 
     proxy = new QSortFilterProxyModel(this);
     proxy->setSourceModel(model);
 
-    proxy->setHeaderData(Column::MANUFACTURER, Qt::Horizontal, "Производитель");
-    proxy->setHeaderData(Column::PLACE, Qt::Horizontal, "Расположение");
-    proxy->setHeaderData(Column::DATE, Qt::Horizontal, "Дата");
+    proxy->setHeaderData(MANUFACTURER, Qt::Horizontal, "Производитель");
+    proxy->setHeaderData(PLACE, Qt::Horizontal, "Расположение");
+    proxy->setHeaderData(DATE, Qt::Horizontal, "Дата");
 
 
     //запрещаем редактирование
 //    ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableView->setModel(proxy);
 
-    ui->tableView->hideColumn(Column::SMID);
+    ui->tableView->hideColumn(SMID);
 
     proxy->sort(2, Qt::AscendingOrder);
     ui->tableView->update();
@@ -95,13 +93,14 @@ void MainWindow::executeFile()
 
 void MainWindow::updateTable()
 {
-    model->query();
+    model->setQuery("SELECT sm.smid, mn.name, sm.storePlace, sd.date "
+                    "FROM `store_manufacturer` AS sm LEFT JOIN `store_date` AS sd ON sm.smid = sd.smid, `manufacturers` AS mn "
+                    "WHERE sm.mid = mn.mid");
 }
 
-//const QModelIndex &MainWindow::findIndex(int smid)
 QModelIndex MainWindow::findIndex(int smid)
 {
-    QModelIndexList findIndexes = proxy->match(proxy->index(0, Column::SMID),
+    QModelIndexList findIndexes = proxy->match(proxy->index(0, SMID),
                                                Qt::DisplayRole,
                                                QVariant(smid), 1);
     if (findIndexes.isEmpty()) {
@@ -140,13 +139,14 @@ void MainWindow::markUpdatedFile(StoreRemainings *sr)
             }
         }
     }
+    updateTable();
 }
 
 void MainWindow::setTrayIconActions()
 {
-    showAction = new QAction("Показать");
-    hideAction = new QAction("Свернуть");
-    quitAction = new QAction("Выход");
+    showAction = new QAction("Показать", this);
+    hideAction = new QAction("Свернуть", this);
+    quitAction = new QAction("Выход", this);
 
     trayMenu = new QMenu(this);
 

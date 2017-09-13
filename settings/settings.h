@@ -30,9 +30,9 @@ private slots:
    void on_btnEdit_clicked();
    void on_btnRemove_clicked();
    void tableContextMenuRequested(QPoint pos);
-   void on_Action_SetFilter();
-   void on_Action_RemoveFilter();
-   void on_Action_Refresh();
+   void on_setFilter();
+   void on_removeFilter();
+   void on_refresh();
    void on_btnSetFilter_clicked();
    void on_btnUnSetFilter_clicked();
 
