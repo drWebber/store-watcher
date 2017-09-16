@@ -41,7 +41,8 @@ SOURCES += main.cpp\
     import/csvreader.cpp \
     import/dataparcer.cpp \
     import/datawriter.cpp \
-    models/coloredsqlquerymodel.cpp
+    models/coloredsqlquerymodel.cpp \
+    store-updater/dataimport.cpp
 
 HEADERS  += mainwindow.h \
     settings/settings.h \
@@ -58,7 +59,8 @@ HEADERS  += mainwindow.h \
     import/csvreader.h \
     import/dataparcer.h \
     import/datawriter.h \
-    models/coloredsqlquerymodel.h
+    models/coloredsqlquerymodel.h \
+    store-updater/dataimport.h
 
 FORMS    += mainwindow.ui \
     settings/settings.ui \

@@ -15,7 +15,6 @@ public:
     StoreUpdater(QFileSystemWatcher &fsw, StoreRemainings &sr);
     void update();
     void run();
-    QSqlDatabase getConnection();
     QString getCurrentTime();
 signals:
     StoreRemainings *updateFinished(StoreRemainings *sr);

@@ -104,7 +104,7 @@ QModelIndex MainWindow::findIndex(int smid)
                                                Qt::DisplayRole,
                                                QVariant(smid), 1);
     if (findIndexes.isEmpty()) {
-        return *(new QModelIndex());
+        return QModelIndex();
     }
     return findIndexes.at(0);
 }
