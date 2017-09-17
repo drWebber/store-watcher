@@ -12,14 +12,16 @@ public:
     bool convertXlsToCsv();
     bool createTxt();
     QString import(QString xlsFilePath);
+    QHash<QString, QString> getUnknownProducts() const;
 protected:
-    bool loadDataInFile(QSqlQuery &query);
-    bool parceData();
-private:
+    QFile *csvFile;
     StoreRemainings *sr;
     DataWriter prodWriter;
+    QHash<QString, QString> unknownProducts;
+    virtual bool loadDataInFile(QSqlQuery &query);
+    virtual bool parceData();
+private:
     QSqlDatabase conn;
-    QFile *csvFile;
     QSqlDatabase getConnection();
 };
 

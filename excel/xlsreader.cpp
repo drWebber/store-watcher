@@ -19,7 +19,7 @@ void XlsReader::openActiveWorkBook()
 {
     if (xlsFile->exists()) {
        workbooks = excel->querySubObject("WorkBooks");
-       workbooks->dynamicCall("Open (const QString&)", xlsFileInfo.absoluteFilePath());
+       workbooks->dynamicCall("Open (const QString&)", xlsFileInfo.absoluteFilePath().replace("/", "\\"));
 
        workbook = excel->querySubObject("ActiveWorkBook");
     }

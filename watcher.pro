@@ -42,7 +42,8 @@ SOURCES += main.cpp\
     import/dataparcer.cpp \
     import/datawriter.cpp \
     models/coloredsqlquerymodel.cpp \
-    store-updater/dataimport.cpp
+    store-updater/dataimport.cpp \
+    store-updater/vitebskdataimport.cpp
 
 HEADERS  += mainwindow.h \
     settings/settings.h \
@@ -60,7 +61,8 @@ HEADERS  += mainwindow.h \
     import/dataparcer.h \
     import/datawriter.h \
     models/coloredsqlquerymodel.h \
-    store-updater/dataimport.h
+    store-updater/dataimport.h \
+    store-updater/vitebskdataimport.h
 
 FORMS    += mainwindow.ui \
     settings/settings.ui \

@@ -5,21 +5,43 @@
 class StoreRemainings
 {
 public:
-    StoreRemainings(int smid, int mid, QString dirPath, QString regExp, QString currentFilePath,
-                    int startRow, int articleCol, int itemCountCol);
+    StoreRemainings();
+    static QList<StoreRemainings *> *loadRemainings();
     void updateCurrentFile();
-    QString getCurrentFilePath();
-    int getSmid();
-    int getStartRow();
-    int getArticleCol();
-    int getItemCountCol();
+    QString getCurrentFilePath() const;
+    void setCurrentFilePath(const QString &value);
+
+    QString getStorePlace() const;
+    void setStorePlace(const QString &value);
+
+    QString getDirPath() const;
+    void setDirPath(const QString &value);
+
+    QString getRegExp() const;
+    void setRegExp(const QString &value);
+
+    int getSmid() const;
+    void setSmid(int value);
+
     int getMid() const;
+    void setMid(int value);
+
+    int getStartRow() const;
+    void setStartRow(int value);
+
+    int getArticleCol() const;
+    void setArticleCol(int value);
+
+    int getItemCountCol() const;
+    void setItemCountCol(int value);
+
 private:
     QString currentFilePath;
-    int smid;
-    int mid;
+    QString storePlace;
     QString dirPath;
     QString regExp;
+    int smid;
+    int mid;
     int startRow;
     int articleCol;
     int itemCountCol;

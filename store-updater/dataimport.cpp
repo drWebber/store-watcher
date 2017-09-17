@@ -92,9 +92,13 @@ QString DataImport::import(QString xlsFilePath)
     return msg;
 }
 
+QHash<QString, QString> DataImport::getUnknownProducts() const
+{
+    return unknownProducts;
+}
+
 bool DataImport::loadDataInFile(QSqlQuery &query)
 {
-
     if (query.exec("LOAD DATA INFILE '" + prodWriter.getFilePath()
                                     + "' IGNORE INTO TABLE `store`(@pid, `smid`, `count`) "
                                       "SET pid = (SELECT `pid` FROM `products` WHERE `art` = @pid AND `mid` = " + QString::number(sr->getMid()) + ")")) {

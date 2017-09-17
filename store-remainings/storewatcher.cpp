@@ -13,23 +13,12 @@ StoreWatcher::StoreWatcher()
 
 void StoreWatcher::setUp()
 {
-    QSqlQuery query;
-    query.exec("SELECT * FROM store_manufacturer");
-    while (query.next()) {
-        int smid = query.value("smid").toInt();
-        int mid = query.value("mid").toInt();
-        QString path = query.value("path").toString();
-        QString regExp = query.value("regexp").toString();
-        QString lastFilePath = query.value("lastPath").toString();
-        int startRow = query.value("startRow").toInt();
-        int articleCol = query.value("articleCol").toInt();
-        int itemCountCol = query.value("itemCountCol").toInt();
-
-        StoreRemainings *tmp = new StoreRemainings(smid, mid, path, regExp, lastFilePath, startRow,
-                                                   articleCol, itemCountCol);
-
-        if(lastFilePath.isEmpty() || !QFile::exists(lastFilePath)){
-            qDebug() << "файл " + lastFilePath + " не существует или пустой!";
+    QList<StoreRemainings *> *rems = StoreRemainings::loadRemainings();
+    QList<StoreRemainings *>::iterator it;
+    for (it = rems->begin(); it != rems->end(); ++it) {
+        StoreRemainings *tmp = *it;
+        if(tmp->getCurrentFilePath().isEmpty() || !QFile::exists(tmp->getCurrentFilePath())){
+            qDebug() << "файл " + tmp->getCurrentFilePath() + " не существует или пустой!";
             tmp->updateCurrentFile();
             emit fileIsBusy(tmp->getSmid());
             StoreUpdater *su = new StoreUpdater(*fsw, *tmp);

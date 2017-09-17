@@ -4,18 +4,9 @@
 #include <qregularexpression.h>
 #include <qsqlquery.h>
 
-StoreRemainings::StoreRemainings(int smid, int mid, QString dirPath, QString regExp,
-                                 QString currentFilePath, int startRow, int articleCol,
-                                 int itemCountCol)
+StoreRemainings::StoreRemainings()
 {
-    this->smid = smid;
-    this->mid = mid;
-    this->dirPath = dirPath;
-    this->regExp = regExp;
-    this->currentFilePath = currentFilePath;
-    this->startRow = startRow;
-    this->articleCol = articleCol;
-    this->itemCountCol = itemCountCol;
+
 }
 
 void StoreRemainings::updateCurrentFile()
@@ -36,32 +27,113 @@ void StoreRemainings::updateCurrentFile()
     query.exec();
 }
 
-QString StoreRemainings::getCurrentFilePath()
+QString StoreRemainings::getCurrentFilePath() const
 {
     return currentFilePath;
 }
 
-int StoreRemainings::getSmid()
+void StoreRemainings::setCurrentFilePath(const QString &value)
+{
+    currentFilePath = value;
+}
+
+QString StoreRemainings::getStorePlace() const
+{
+    return storePlace;
+}
+
+void StoreRemainings::setStorePlace(const QString &value)
+{
+    storePlace = value;
+}
+
+QList<StoreRemainings *> *StoreRemainings::loadRemainings()
+{
+    QList<StoreRemainings *> *rems = new QList<StoreRemainings *>();
+    QSqlQuery query;
+    query.exec("SELECT * FROM store_manufacturer");
+    while (query.next()) {
+        StoreRemainings *sr = new StoreRemainings();
+        sr->setSmid(query.value("smid").toInt());
+        sr->setMid(query.value("mid").toInt());
+        sr->setDirPath(query.value("path").toString());
+        sr->setRegExp(query.value("regexp").toString());
+        sr->setCurrentFilePath(query.value("lastPath").toString());
+        sr->setStartRow(query.value("startRow").toInt());
+        sr->setArticleCol(query.value("articleCol").toInt());
+        sr->setItemCountCol(query.value("itemCountCol").toInt());
+        sr->setStorePlace(query.value("storePlace").toString());
+        rems->push_back(sr);
+    }
+    return rems;
+}
+
+QString StoreRemainings::getDirPath() const
+{
+    return dirPath;
+}
+
+void StoreRemainings::setDirPath(const QString &value)
+{
+    dirPath = value;
+}
+
+QString StoreRemainings::getRegExp() const
+{
+    return regExp;
+}
+
+void StoreRemainings::setRegExp(const QString &value)
+{
+    regExp = value;
+}
+
+int StoreRemainings::getSmid() const
 {
     return smid;
 }
 
-int StoreRemainings::getStartRow()
+void StoreRemainings::setSmid(int value)
 {
-    return startRow;
-}
-
-int StoreRemainings::getArticleCol()
-{
-    return articleCol;
-}
-
-int StoreRemainings::getItemCountCol()
-{
-    return itemCountCol;
+    smid = value;
 }
 
 int StoreRemainings::getMid() const
 {
     return mid;
+}
+
+void StoreRemainings::setMid(int value)
+{
+    mid = value;
+}
+
+int StoreRemainings::getStartRow() const
+{
+    return startRow;
+}
+
+void StoreRemainings::setStartRow(int value)
+{
+    startRow = value;
+}
+
+int StoreRemainings::getArticleCol() const
+{
+    return articleCol;
+}
+
+void StoreRemainings::setArticleCol(int value)
+{
+    articleCol = value;
+}
+
+int StoreRemainings::getItemCountCol() const
+{
+    return itemCountCol;
+}
+
+void StoreRemainings::setItemCountCol(int value)
+{
+    itemCountCol = value;
 }
