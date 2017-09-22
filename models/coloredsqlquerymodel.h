@@ -9,8 +9,9 @@ public:
     ColoredSqlQueryModel(QObject *parent);
     QVariant data(const QModelIndex &index, int role) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role);
+    void update();
 private:
-    mutable QVector<QColor*> columnColor;
+    QVector<QColor*> columnColor;
 };
 
 #endif // COLOREDSQLQUERYMODEL_H

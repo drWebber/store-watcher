@@ -25,7 +25,6 @@ public:
 public slots:
     void showSettingsWnd();
     void executeFile();
-    void updateTable();
     void markBusyFile(int smid);
     void markUpdatedFile(StoreRemainings *sr);
     void setTrayIconActions();

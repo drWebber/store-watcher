@@ -52,7 +52,7 @@ void ActionWnd::setModelData()
     model->setData(indx, ui->leCurrentDir->text());
 
     indx = model->index(currentRow, REGEXP_COL);
-    model->setData(indx, ui->leRegExp->text());
+    model->setData(indx, ui->leRegExp->text() + ".+xlsx?$");
 
     indx = model->index(currentRow, CURR_PATH);
     model->setData(indx, getFilePath());

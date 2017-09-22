@@ -59,8 +59,9 @@ void StoreUpdater::update()
         emit importError(msg);
     }
 
-    qDebug() << getCurrentTime() << "обновление остатков" << sr->getCurrentFilePath() << "завершено";
-    delete di;
+    qDebug() << getCurrentTime() << "обновление остатков"
+             << sr->getCurrentFilePath() << "завершено";
+
 }
 
 void StoreUpdater::run()

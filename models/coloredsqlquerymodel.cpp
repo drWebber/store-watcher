@@ -5,15 +5,12 @@
 ColoredSqlQueryModel::ColoredSqlQueryModel(QObject *parent) :
     QSqlQueryModel(parent)
 {
-//    columnColor = new QVector<QColor*>;
+
 }
 
 QVariant ColoredSqlQueryModel::data(const QModelIndex &index, int role) const
 {
     if (role == Qt::TextColorRole) {
-        while (columnColor.count() < rowCount()) {
-                columnColor.push_back(new QColor(Qt::black));
-        }
         return *columnColor.at(index.row());
     }
     return QSqlQueryModel::data(index, role);
@@ -26,4 +23,15 @@ bool ColoredSqlQueryModel::setData(const QModelIndex &index, const QVariant &val
         return true;
     }
     return QSqlQueryModel::setData(index, value, role);
+}
+
+void ColoredSqlQueryModel::update()
+{
+    setQuery("SELECT sm.smid, mn.name, sm.storePlace, sd.date "
+             "FROM `store_manufacturer` AS sm LEFT JOIN `store_date` AS sd ON sm.smid = sd.smid, `manufacturers` AS mn "
+             "WHERE sm.mid = mn.mid");
+    while (columnColor.count() < rowCount()) {
+            columnColor.push_back(new QColor(Qt::black));
+    }
+
 }

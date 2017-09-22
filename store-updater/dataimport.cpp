@@ -11,6 +11,13 @@
 DataImport::DataImport(StoreRemainings *sr)
 {
     this->sr = sr;
+    connName = sr->getCurrentFilePath();
+}
+
+DataImport::~DataImport()
+{
+    conn.close();
+    QSqlDatabase::removeDatabase(connName);
 }
 
 bool DataImport::connect()
@@ -21,7 +28,7 @@ bool DataImport::connect()
 
 QSqlDatabase DataImport::getConnection()
 {
-    QSqlDatabase conn = QSqlDatabase::addDatabase("QMYSQL3", sr->getCurrentFilePath());
+    QSqlDatabase conn = QSqlDatabase::addDatabase("QMYSQL3", connName);
     conn.setHostName("localhost");
     conn.setDatabaseName("nordelectro");
     conn.setUserName("root");
@@ -46,7 +53,7 @@ bool DataImport::createTxt()
 {
     bool result = true;
     if (!prodWriter.open(csvFile->fileName() + ".txt")) {
-        qDebug() << "DataImport::createTxt() ошибка открытия файла:" + csvFile->fileName() + ".txt";
+        qDebug() << "DataImport::createTxt() ошибка открытия файла: " + csvFile->fileName() + ".txt";
         result = false;
     }
 
@@ -71,7 +78,6 @@ QString DataImport::import(QString xlsFilePath)
 
     if (!loadDataInFile(query)) {
         query.exec("ROLLBACK");
-        conn.close();
         return query.lastError().text();
     }
 
@@ -88,7 +94,6 @@ QString DataImport::import(QString xlsFilePath)
     }
 
     query.exec("COMMIT");
-    conn.close();
     return msg;
 }
 
@@ -109,9 +114,10 @@ bool DataImport::loadDataInFile(QSqlQuery &query)
 
 bool DataImport::parceData()
 {
-    CsvReader cr = CsvReader(csvFile, sr->getStartRow() - 1);
     QList<int> productInfo = QList<int>() << sr->getArticleCol() - 1
                                           << sr->getItemCountCol() -1;
+    int maxElem = *std::max_element(productInfo.begin(), productInfo.end());
+    CsvReader cr = CsvReader(csvFile, sr->getStartRow() - 1, maxElem);
 
     QString smid = QString::number(sr->getSmid());
     DataParcer prodParcer(productInfo);

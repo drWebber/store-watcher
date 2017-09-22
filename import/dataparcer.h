@@ -11,8 +11,10 @@ public:
     DataParcer(const QList<int> &columns);
     QString parceLine(QString line);
 private:
+    int maxElem;
     QList<int> columns;
-    void replaceLine(QString &line, QString &pattern);
+    void replaceLine(QString &line, QString &replacePatt);
+    int count;
 };
 
 #endif // DATAPARCER_H

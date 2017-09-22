@@ -14,10 +14,11 @@ VitebskDataImport::VitebskDataImport(StoreRemainings *sr) :
 
 bool VitebskDataImport::parceData()
 {
-    CsvReader cr = CsvReader(csvFile, sr->getStartRow() - 1);
     QList<int> productInfo = QList<int>() << sr->getArticleCol() - 1
                                           << DESCRIPTION_COL
                                           << sr->getItemCountCol() -1;
+    int maxElem = *qMax(productInfo.begin(), productInfo.end());
+    CsvReader cr = CsvReader(csvFile, sr->getStartRow() - 1, maxElem);
     DataParcer prodParcer(productInfo);
     if (cr.openCsv()) {
         while (!cr.atEnd()) {
@@ -43,11 +44,33 @@ bool VitebskDataImport::parceData()
 QString VitebskDataImport::findPid(const QString article, const QString desc) const
 {
     QSqlQuery query;
-    query.prepare("SELECT `pid` FROM `products` WHERE `art` = :art AND `description` = :desc");
-    query.bindValue(":art", article);
-    query.bindValue(":desc", desc);
+    QString pid;
+    query.prepare("SELECT `pid`, `description` FROM `products` WHERE `art` = :art");
+    query.bindValue(":art", article);    
     query.exec();
-    return query.next() ? query.value(0).toString() : QString();
+    if (query.size() <= 0) return pid;
+    if (query.size() > 1) {
+        /* если по артикулу получено несколько pid - собираем их и сравниваем
+         * с нужным desc, предварительно удалив все символы [^A-zА-я0-9] */
+        QStringList pidList, descList;
+        while (query.next()) {
+            pidList << query.value(0).toString();
+            descList << query.value(1).toString();
+        }
+        for (int i = 0; i < pidList.count(); ++i) {
+            if (cleanSpecSym(descList.at(i)) == cleanSpecSym(desc)) {
+                return pidList.at(i);
+            }
+        }
+        return QString();
+    }
+    query.next();
+    return query.value(0).toString();
+}
+
+QString VitebskDataImport::cleanSpecSym(QString str) const
+{
+    return str.replace(QRegExp("[^A-zА-я0-9]"), "");
 }
 
 bool VitebskDataImport::loadDataInFile(QSqlQuery &query)

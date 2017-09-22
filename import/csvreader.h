@@ -7,7 +7,7 @@
 class CsvReader
 {
 public:
-    CsvReader(QFile *csvFile, int startRow);
+    CsvReader(QFile *csvFile, int startRow, int maxElem);
     ~CsvReader();
     QString readLine();
     bool atEnd();
@@ -16,6 +16,9 @@ private:
     QFile *csvFile;
     QTextStream *stream;
     int startRow;
+    int maxElem;
+    void replaceLine(QString &line, QString &replacePatt);
+    int commaCounter(QString line);
 };
 
 #endif // CSVREADER_H

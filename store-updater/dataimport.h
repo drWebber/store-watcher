@@ -8,6 +8,7 @@ class DataImport
 {
 public:
     DataImport(StoreRemainings *sr);
+    ~DataImport();
     bool connect();
     bool convertXlsToCsv();
     bool createTxt();
@@ -22,6 +23,7 @@ protected:
     virtual bool parceData();
 private:
     QSqlDatabase conn;
+    QString connName;
     QSqlDatabase getConnection();
 };
 

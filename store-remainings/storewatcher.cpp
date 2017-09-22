@@ -18,7 +18,8 @@ void StoreWatcher::setUp()
     for (it = rems->begin(); it != rems->end(); ++it) {
         StoreRemainings *tmp = *it;
         if(tmp->getCurrentFilePath().isEmpty() || !QFile::exists(tmp->getCurrentFilePath())){
-            qDebug() << "файл " + tmp->getCurrentFilePath() + " не существует или пустой!";
+            qDebug() << "файл " + tmp->getRegExp() +
+                        tmp->getCurrentFilePath() + " не существует или пустой!";
             tmp->updateCurrentFile();
             emit fileIsBusy(tmp->getSmid());
             StoreUpdater *su = new StoreUpdater(*fsw, *tmp);

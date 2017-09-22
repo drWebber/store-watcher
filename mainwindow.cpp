@@ -34,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent) :
     query.exec("SET character_set_database=UTF8");
 
     model = new ColoredSqlQueryModel(this);
-    updateTable();
+    model->update();
 
     proxy = new QSortFilterProxyModel(this);
     proxy->setSourceModel(model);
@@ -75,7 +75,7 @@ void MainWindow::showSettingsWnd()
     settingsWnd->setWindowIcon(QIcon(":/recources/images/Programs.png"));
 
     settingsWnd->setAttribute(Qt::WA_DeleteOnClose);
-    connect(settingsWnd, SIGNAL(destroyed(QObject*)), this, SLOT(updateTable()));
+    model->update();
 
     settingsWnd->setMinimumWidth(1024);
     settingsWnd->setWindowTitle("Расположение файлов остатков");
@@ -89,13 +89,6 @@ void MainWindow::executeFile()
     if(QFile::exists(path)){
         QDesktopServices::openUrl(QUrl::fromLocalFile(path));
     }
-}
-
-void MainWindow::updateTable()
-{
-    model->setQuery("SELECT sm.smid, mn.name, sm.storePlace, sd.date "
-                    "FROM `store_manufacturer` AS sm LEFT JOIN `store_date` AS sd ON sm.smid = sd.smid, `manufacturers` AS mn "
-                    "WHERE sm.mid = mn.mid");
 }
 
 QModelIndex MainWindow::findIndex(int smid)
@@ -139,7 +132,7 @@ void MainWindow::markUpdatedFile(StoreRemainings *sr)
             }
         }
     }
-    updateTable();
+    model->update();
 }
 
 void MainWindow::setTrayIconActions()

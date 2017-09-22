@@ -14,6 +14,7 @@ protected:
     bool parceData();
 private:
     QString findPid(const QString article, const QString desc) const;
+    QString cleanSpecSym(QString str) const;
     bool loadDataInFile(QSqlQuery &query) override;
 };
 
