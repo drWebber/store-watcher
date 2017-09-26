@@ -55,7 +55,9 @@ QList<StoreRemainings *> *StoreRemainings::loadRemainings()
     while (query.next()) {
         StoreRemainings *sr = new StoreRemainings();
         sr->setSmid(query.value("smid").toInt());
-        sr->setMid(query.value("mid").toInt());
+        int mid = query.value("mid").toInt();
+        sr->setMid(mid);
+        sr->setManufacturer(getManufacturerName(mid));
         sr->setDirPath(query.value("path").toString());
         sr->setRegExp(query.value("regexp").toString());
         sr->setCurrentFilePath(query.value("lastPath").toString());
@@ -136,4 +138,26 @@ int StoreRemainings::getItemCountCol() const
 void StoreRemainings::setItemCountCol(int value)
 {
     itemCountCol = value;
+}
+
+QString StoreRemainings::getManufacturer() const
+{
+    return manufacturer;
+}
+
+void StoreRemainings::setManufacturer(const QString &value)
+{
+    manufacturer = value;
+}
+
+QString StoreRemainings::getManufacturerName(int mid)
+{
+    QSqlQuery q;
+    q.prepare("SELECT `name` FROM `manufacturers` WHERE `mid` = :mid");
+    q.bindValue(":mid", mid);
+    q.exec();
+    if (q.next()) {
+        return q.value(0).toString();
+    }
+    return QString("getManufacturerName error");
 }

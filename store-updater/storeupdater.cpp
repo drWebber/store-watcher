@@ -17,7 +17,8 @@ StoreUpdater::StoreUpdater(QFileSystemWatcher &fsw, StoreRemainings &sr)
 
 void StoreUpdater::update()
 {
-    qDebug() << getCurrentTime() << "обновление остатков" << sr->getCurrentFilePath();
+    qDebug() << getCurrentTime() << "обновление остатков" << sr->getManufacturer()
+             << sr->getStorePlace();
 
     DataImport *di;
     if (sr->getStorePlace() == "Витебск") {
@@ -60,7 +61,7 @@ void StoreUpdater::update()
     }
 
     qDebug() << getCurrentTime() << "обновление остатков"
-             << sr->getCurrentFilePath() << "завершено";
+             << sr->getManufacturer() << sr->getStorePlace() << "завершено";
 
 }
 

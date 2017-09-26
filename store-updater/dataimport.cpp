@@ -7,11 +7,14 @@
 #include <qsqlquery.h>
 #include <qdatetime.h>
 #include <qregularexpression.h>
+#include <qcryptographichash.h>
 
 DataImport::DataImport(StoreRemainings *sr)
 {
     this->sr = sr;
-    connName = sr->getCurrentFilePath();
+    connName = QString(QCryptographicHash::hash(sr->getCurrentFilePath().toLocal8Bit(),
+                                        QCryptographicHash::Md5).toHex());
+    qDebug() << "connName" << connName;
 }
 
 DataImport::~DataImport()

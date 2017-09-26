@@ -35,16 +35,12 @@ public:
     int getItemCountCol() const;
     void setItemCountCol(int value);
 
+    QString getManufacturer() const;
+    void setManufacturer(const QString &value);
 private:
-    QString currentFilePath;
-    QString storePlace;
-    QString dirPath;
-    QString regExp;
-    int smid;
-    int mid;
-    int startRow;
-    int articleCol;
-    int itemCountCol;
+    QString currentFilePath, storePlace, dirPath, regExp, manufacturer;
+    int smid, mid, startRow, articleCol, itemCountCol;
+    static QString getManufacturerName(int mid);
 };
 
 #endif // STOREREMAININGS_H
