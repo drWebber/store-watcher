@@ -105,8 +105,7 @@ QHash<QString, QString> DataImport::getUnknownProducts() const
 bool DataImport::loadDataInFile(QSqlQuery &query)
 {
     if (query.exec("LOAD DATA INFILE '" + prodWriter.getFilePath()
-                                    + "' IGNORE INTO TABLE `store`(@pid, `smid`, `count`) "
-                                      "SET pid = (SELECT `pid` FROM `products` WHERE `art` = @pid AND `mid` = " + QString::number(sr->getMid()) + ")")) {
+                                    + "' IGNORE INTO TABLE `store`")) {
         return true;
     }
     return false;
@@ -122,11 +121,45 @@ bool DataImport::parceData()
     QString smid = QString::number(sr->getSmid());
     DataParcer prodParcer(productInfo);
     if (cr.openCsv()) {
+        const int COLUMN_COUNT = 3; //кол-во столбцов для встаки `pid`, `smid`, `count`
+        //собираем вектор значений на запись в txt-файл для импорта
+        QVector<QStringList> import;
+        QString predicate;  // Хранит значения предиката IN() для выборки pid из бд
         while (!cr.atEnd()) {
             QString line = prodParcer.parceLine(cr.readLine());
             if (!line.isEmpty()) {
-                line.replace(QRegularExpression("^(.+?)\t"), "\\1\t" + smid + '\t');
-                prodWriter.append(line);
+                QStringList row = line.split('\t');
+                row.insert(1, smid);
+                if (row.count() == COLUMN_COUNT) {
+                    predicate.append("\"" + row.at(0) + "\",");
+                    import.append(row);
+                }
+            }            
+        }
+        predicate.chop(1);
+
+        // Собираем QMap<'article', 'pid> для дальнейшего поиска pid
+        QMap<QString, QString> pidMap;
+        // Выбираем `article`, `pid` из таблицы `products`
+        QSqlQuery q;
+        q.prepare("SELECT `art`, `pid` FROM `products` WHERE `mid` = :mid AND `art` "
+                  "IN(" + predicate + ")");
+        q.bindValue(":mid", sr->getMid());
+        q.exec();
+        while (q.next()) {
+            pidMap.insert(q.value("art").toString(), q.value("pid").toString());
+        }
+
+        //пишем в txt
+        QVectorIterator<QStringList> it(import);
+        while (it.hasNext()) {
+            QStringList row = it.next();
+            if (row.count() == COLUMN_COUNT) {
+                QString pid = pidMap.value(row.at(0));
+                if (!pid.isEmpty()) {
+                    QString line = pid + '\t' + row.at(1) + '\t' + row.at(2);
+                    prodWriter.append(line);
+                }
             }
         }
         return true;
