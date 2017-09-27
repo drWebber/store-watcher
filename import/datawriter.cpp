@@ -7,6 +7,7 @@ DataWriter::DataWriter()
 
 DataWriter::~DataWriter()
 {
+    file.close();
     file.remove();
 }
 

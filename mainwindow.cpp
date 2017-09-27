@@ -60,6 +60,16 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(markUpdatedFile(StoreRemainings*)));
     sw->setUp();
 
+
+    tableMenu = new QMenu(this);
+    refreshRemainings = new QAction("Обновить остатки", this);
+    connect(refreshRemainings, SIGNAL(triggered(bool)),
+            this, SLOT(on_UpdateRemainings()));
+    tableMenu->addAction(refreshRemainings);
+    ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->tableView, SIGNAL(customContextMenuRequested(QPoint)),
+            this, SLOT(tableContextMenuRequested(QPoint)));
+
     this->setTrayIconActions();
     this->showTrayIcon();
 }
@@ -204,4 +214,27 @@ void MainWindow::on_btnSetFilter_triggered(bool checked)
     } else {
         proxy->setFilterFixedString("");
     }
+}
+
+void MainWindow::on_UpdateRemainings()
+{
+    int row = ui->tableView->currentIndex().row();
+    int smid = proxy->data(proxy->index(row, 0), Qt::DisplayRole).toInt();
+    QSqlQuery q;
+    q.prepare("SELECT `lastPath` FROM `store_manufacturer` WHERE smid = :smid");
+    q.bindValue(":smid", smid);
+    q.exec();
+    if (q.next()) {
+        sw->updateRemainings(q.value(0).toString());
+    } else {
+        QMessageBox::warning(this, "Ошибка обновления остков",
+                             "Обновить остатки в строке " + QString::number(row) +
+                             " не удалось.");
+    }
+
+}
+
+void MainWindow::tableContextMenuRequested(QPoint pos)
+{
+    tableMenu->popup(ui->tableView->viewport()->mapToGlobal(pos));
 }

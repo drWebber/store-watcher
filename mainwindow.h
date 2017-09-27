@@ -32,7 +32,8 @@ private slots:
     void showTrayIcon();
     void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
     void on_btnSetFilter_triggered(bool checked);
-
+    void on_UpdateRemainings();
+    void tableContextMenuRequested(QPoint pos);
 private:
     Ui::MainWindow *ui;
     Settings *settingsWnd;
@@ -41,9 +42,11 @@ private:
     StoreWatcher *sw;
     QSystemTrayIcon *trayIcon;
     QMenu *trayMenu;
+    QMenu *tableMenu;
     QAction *showAction;
     QAction *hideAction;
     QAction *quitAction;
+    QAction *refreshRemainings;
     enum Column {SMID, MANUFACTURER, PLACE, DATE};
 protected:
     void changeEvent(QEvent *event) override;

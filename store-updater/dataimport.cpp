@@ -14,7 +14,6 @@ DataImport::DataImport(StoreRemainings *sr)
     this->sr = sr;
     connName = QString(QCryptographicHash::hash(sr->getCurrentFilePath().toLocal8Bit(),
                                         QCryptographicHash::Md5).toHex());
-    qDebug() << "connName" << connName;
 }
 
 DataImport::~DataImport()
